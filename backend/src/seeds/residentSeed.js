@@ -66,7 +66,7 @@ const residents = [
 
 async function seedResidents() {
     try {
-        await mongoose.connect("mongodb://localhost:27017/neiboorhood-surveillance");
+        await mongoose.connect("mongodb://localhost:27017/neighbourhood-surveillance");
 
         await Resident.deleteMany();
 

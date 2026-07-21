@@ -1,14 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
+const Resident = require("./src/models/Resident");
+const residentRoutes = require("./src/routes/residentRoutes");
+
 const app = express();
 
 const port = process.env.PORT || 5000;
 
-const Resident = require("./src/models/Resident");
+app.use(express.json());
+
+app.use("/api/residents", residentRoutes);
 
 mongoose
-	.connect("mongodb://localhost:27017/neighborhood-surveillance")
+	.connect("mongodb://localhost:27017/neighbourhood-surveillance")
 	.then(() => {
 		console.log("Connected to MongoDB");
 	})
@@ -17,7 +22,7 @@ mongoose
 	});
 
 app.get("/", (req, res) => {
-	res.send("neighborhood Surveillance is running!");
+	res.send("neighbourhood Surveillance is running!");
 });
 
 app.get("/test-resident", async (req, res) => {
@@ -40,4 +45,3 @@ app.get("/test-resident", async (req, res) => {
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`);
 });
-

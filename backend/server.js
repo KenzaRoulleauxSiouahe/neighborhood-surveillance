@@ -36,37 +36,6 @@ app.get("/", (req, res) => {
 	res.send("neighbourhood Surveillance is running!");
 });
 
-app.get("/test-resident", async (req, res) => {
-	try {
-		const resident = new Resident({
-			name: "Mr Smith",
-			house: "A3",
-			age: 30,
-			role: "Plumber",
-			isCultMember: true,
-		});
-		await resident.save();
-
-		res.status(201).json(resident);
-	} catch (err) {
-		res.status(500).json({ error: err.message });
-	}
-});
-
-app.get("/test-camera", async (req, res) => {
-	try {
-		const camera = new Camera({
-			name: "Camera 1",
-		});
-
-		await camera.save();
-
-		res.status(201).json(camera);
-	} catch (err) {
-		res.status(500).json({ error: err.message });
-	}
-});
-
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`);
 });

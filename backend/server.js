@@ -7,6 +7,8 @@ const residentRoutes = require("./src/routes/residentRoutes");
 const Location = require("./src/models/Location");
 const locationRoutes = require("./src/routes/locationRoutes");
 
+const Camera = require("./src/models/Camera");
+
 const app = express();
 
 const port = process.env.PORT || 5000;
@@ -41,6 +43,20 @@ app.get("/test-resident", async (req, res) => {
 		await resident.save();
 
 		res.status(201).json(resident);
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
+});
+
+app.get("/test-camera", async (req, res) => {
+	try {
+		const camera = new Camera({
+			name: "Camera 1",
+		});
+
+		await camera.save();
+
+		res.status(201).json(camera);
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}

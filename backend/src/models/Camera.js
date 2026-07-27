@@ -6,9 +6,8 @@ const cameraSchema = new mongoose.Schema({
         required: true,
     },
 
-    location: { 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Location",
+    zone: { 
+        type: String,
         default: null
     },
 

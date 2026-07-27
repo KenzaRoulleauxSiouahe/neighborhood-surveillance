@@ -12,6 +12,8 @@ const Camera = require("./src/models/Camera");
 
 const gameRoutes = require("./src/routes/gameRoutes");
 
+const zoneRoutes = require("./src/routes/zoneRoutes");
+
 const app = express();
 
 const port = process.env.PORT || 5000;
@@ -22,6 +24,7 @@ app.use("/api/residents", residentRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/cameras", cameraRoutes);
 app.use("/api/game", gameRoutes);
+app.use("/api/zones", zoneRoutes);
 
 mongoose
 	.connect("mongodb://localhost:27017/neighbourhood-surveillance")

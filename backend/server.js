@@ -7,6 +7,7 @@ const residentRoutes = require("./src/routes/residentRoutes");
 const Location = require("./src/models/Location");
 const locationRoutes = require("./src/routes/locationRoutes");
 
+const cameraRoutes = require("./src/routes/cameraRoutes");
 const Camera = require("./src/models/Camera");
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json());
 
 app.use("/api/residents", residentRoutes);
 app.use("/api/locations", locationRoutes);
+app.use("/api/cameras", cameraRoutes);
 
 mongoose
 	.connect("mongodb://localhost:27017/neighbourhood-surveillance")

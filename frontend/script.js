@@ -1,11 +1,25 @@
-console.log("Frontent loaded");
-
+let camerasData = [];
 let selectedCamera = null;
 let cameraPositions = {};
 
+const API_URL = "http://localhost:5000/api";
 const cameras = document.querySelectorAll(".camera-btn");
 const cameraButtons = document.querySelectorAll(".camera-btn");
 const zones = document.querySelectorAll(".zone");
+
+async function loadCameras() {
+	try {
+		const response = await fetch(`${API_URL}/cameras`);
+		const cameras = await response.json();
+		camerasData = cameras;
+
+		console.log("Loaded cameras:", camerasData);
+	} catch (error) {
+		console.error("Error loading cameras:", error);
+	}
+}
+
+loadCameras();
 
 cameras.forEach((camera) => {
 	camera.addEventListener("click", () => {

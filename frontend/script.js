@@ -13,6 +13,22 @@ async function loadCameras() {
 		const cameras = await response.json();
 		camerasData = cameras;
 
+		cameras.forEach((camera) => {
+			if (camera.zone) {
+				const zoneElement = document.querySelector(`[data-zone="${camera.zone}"]`);
+				if (zoneElement) {
+					zoneElement.textContent = `🎥 ${camera.name.replace("Camera ", "")}`;
+					zoneElement.dataset.camera = camera.name;
+					cameraPositions[camera.name] = camera.zone;
+
+					const button = document.querySelector(`[data-camera="${camera.name}"]`);
+					if (button) {
+						button.classList.add("placed");
+					}
+				}
+			}
+		});
+
 		console.log("Loaded cameras:", camerasData);
 	} catch (error) {
 		console.error("Error loading cameras:", error);

@@ -4,11 +4,19 @@ let selectedCamera = null;
 let cameraPositions = {};
 
 const cameras = document.querySelectorAll(".camera-btn");
+const cameraButtons = document.querySelectorAll(".camera-btn");
 const zones = document.querySelectorAll(".zone");
 
 cameras.forEach((camera) => {
 	camera.addEventListener("click", () => {
 		selectedCamera = camera.dataset.camera;
+
+		cameras.forEach((cam) => {
+			cam.classList.remove("selected");
+		});
+
+		camera.classList.add("selected");
+
 		console.log("Selected:", selectedCamera);
 	});
 });
@@ -38,10 +46,13 @@ zones.forEach((zone) => {
 			return;
 		}
 
-		zone.textContent = "🎥";
+		zone.textContent = `🎥 ${selectedCamera.replace("Camera ", "")}`;
 		zone.dataset.camera = selectedCamera;
 
 		cameraPositions[selectedCamera] = zone.dataset.zone;
+		const button = document.querySelector(`[data-camera="${selectedCamera}"]`);
+
+		button.classList.add("placed");
 
 		console.log(selectedCamera, "placed at", zone.textContent);
 	});

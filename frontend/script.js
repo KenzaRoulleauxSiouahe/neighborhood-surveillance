@@ -21,17 +21,19 @@ async function loadCameras() {
 
 loadCameras();
 
-cameras.forEach((camera) => {
-	camera.addEventListener("click", () => {
-		selectedCamera = camera.dataset.camera;
+cameras.forEach((button) => {
+	button.addEventListener("click", () => {
+		const cameraName = button.dataset.camera;
+
+		selectedCamera = camerasData.find((camera) => camera.name === cameraName);
+
+		console.log("Selected camera:", selectedCamera);
 
 		cameras.forEach((cam) => {
 			cam.classList.remove("selected");
 		});
 
-		camera.classList.add("selected");
-
-		console.log("Selected:", selectedCamera);
+		button.classList.add("selected");
 	});
 });
 

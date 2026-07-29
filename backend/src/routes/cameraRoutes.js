@@ -12,4 +12,21 @@ router.get("/", async (req, res) => {
 	}
 });
 
+//UPDATE camera location
+router.patch("/:id", async (req, res) => {
+	try {
+		const camera = await Camera.findById(req.params.id);
+
+		camera.zone = req.body.zone;
+
+		await camera.save();
+
+		res.status(200).json(camera);
+	} catch (err) {
+		res.status(500).json({
+			error: err.message,
+		});
+	}
+});
+
 module.exports = router;

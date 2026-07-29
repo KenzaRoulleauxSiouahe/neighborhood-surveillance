@@ -21,6 +21,23 @@ async function loadCameras() {
 
 loadCameras();
 
+async function updateCameraZone(cameraId, zone) {
+	try {
+		const response = await fetch(`http://localhost:5000/api/cameras/${cameraId}`, {
+			method: "PATCH",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ zone }),
+		});
+		const updatedCamera = await response.json();
+		camerasData = camerasData.map((camera) => (camera._id === updatedCamera._id ? updatedCamera : camera));
+		console.log("Updated camera:", updatedCamera);
+	} catch (error) {
+		console.error("Error updating camera zone:", error);
+	}
+}
+
 cameras.forEach((button) => {
 	button.addEventListener("click", () => {
 		const cameraName = button.dataset.camera;
@@ -38,20 +55,20 @@ cameras.forEach((button) => {
 });
 
 zones.forEach((zone) => {
-	zone.addEventListener("click", () => {
+	zone.addEventListener("click", async () => {
 		if (selectedCamera === null) {
 			console.log("Please select a camera first.");
 			return;
 		}
 
-		if (cameraPositions[selectedCamera]) {
-			const confirmMove = confirm(`${selectedCamera} is already placed at zone ${cameraPositions[selectedCamera]}. Do you want to move it to zone ${zone.dataset.zone}?`);
+		if (cameraPositions[selectedCamera.name]) {
+			const confirmMove = confirm(`${selectedCamera.name} is already placed at zone ${cameraPositions[selectedCamera.name]}. Do you want to move it to zone ${zone.dataset.zone}?`);
 
 			if (!confirmMove) {
 				return;
 			}
 
-			const previousZone = document.querySelector(`[data-zone="${cameraPositions[selectedCamera]}"]`);
+			const previousZone = document.querySelector(`[data-zone="${cameraPositions[selectedCamera.name]}"]`);
 			previousZone.textContent = previousZone.dataset.zone;
 
 			previousZone.textContent = previousZone.dataset.zone;
@@ -62,14 +79,16 @@ zones.forEach((zone) => {
 			return;
 		}
 
-		zone.textContent = `🎥 ${selectedCamera.replace("Camera ", "")}`;
-		zone.dataset.camera = selectedCamera;
+		zone.textContent = `🎥 ${selectedCamera.name.replace("Camera ", "")}`;
 
-		cameraPositions[selectedCamera] = zone.dataset.zone;
-		const button = document.querySelector(`[data-camera="${selectedCamera}"]`);
+		await updateCameraZone(selectedCamera._id, zone.dataset.zone);
+		zone.dataset.camera = selectedCamera.name;
+
+		cameraPositions[selectedCamera.name] = zone.dataset.zone;
+		const button = document.querySelector(`[data-camera="${selectedCamera.name}"]`);
 
 		button.classList.add("placed");
 
-		console.log(selectedCamera, "placed at", zone.textContent);
+		console.log(selectedCamera.name, "placed at", zone.textContent);
 	});
 });

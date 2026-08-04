@@ -54,16 +54,46 @@ loadLocations();
 
 function displayLocations() {
 	const layer = document.getElementById("location-layer");
+	const positions = [];
 
 	locationsData.forEach((location) => {
 		const icon = document.createElement("div");
 
 		icon.classList.add("location-icon");
 
-		icon.textContent = getLocationIcon(location.type);
+		if (location.type === "forest") {
+			icon.classList.add("forest-icon");
 
-		const x = Math.random() * 85;
-		const y = Math.random() * 85;
+			icon.innerHTML = `
+		<span>🌲</span>
+		<span>🌲</span>
+		<span>🌲</span>
+	`;
+		} else {
+			icon.textContent = getLocationIcon(location.type);
+		}
+
+		let x;
+		let y;
+		let validPosition = false;
+
+		while (!validPosition) {
+			x = 10 + Math.random() * 75;
+			y = 10 + Math.random() * 75;
+
+			validPosition = true;
+
+			for (const pos of positions) {
+				const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
+
+				if (distance < 18) {
+					validPosition = false;
+					break;
+				}
+			}
+		}
+
+		positions.push({ x, y });
 
 		icon.style.left = `${x}%`;
 		icon.style.top = `${y}%`;

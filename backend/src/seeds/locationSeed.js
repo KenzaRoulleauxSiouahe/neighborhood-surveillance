@@ -3,54 +3,54 @@ const Location = require("../models/Location");
 
 const locations = [
 	{
-		name: "House 1",
+		name: "Michonne and Rick's House",
 		type: "house",
 		zone: null,
 	},
 	{
-		name: "House 2",
-		type: "house",
-		zone: null,
-	},
-
-	{
-		name: "House 3",
+		name: "Maggie and Glenn's House",
 		type: "house",
 		zone: null,
 	},
 
 	{
-		name: "House 4",
+		name: "Daryl's house",
 		type: "house",
 		zone: null,
 	},
 
 	{
-		name: "House 5",
+		name: "Carol's House",
 		type: "house",
 		zone: null,
 	},
 
 	{
-		name: "House 6",
+		name: "Rosita's House",
 		type: "house",
 		zone: null,
 	},
 
 	{
-		name: "House 7",
+		name: "Sasha's House",
 		type: "house",
 		zone: null,
 	},
 
 	{
-		name: "House 8",
+		name: "Bob's House",
 		type: "house",
 		zone: null,
 	},
 
 	{
-		name: "House 9",
+		name: "Beth's House",
+		type: "house",
+		zone: null,
+	},
+
+	{
+		name: "Eziekiel's House",
 		type: "house",
 		zone: null,
 	},

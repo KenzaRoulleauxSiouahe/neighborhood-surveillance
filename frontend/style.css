@@ -45,10 +45,20 @@ h2 {
 
 .location-icon {
 	position: absolute;
-	font-size: 45px;
+	font-size: 60px;
 	transform: translate(-50%, -50%);
+	z-index: 20;
+	white-space: nowrap;
+}
+.forest-icon {
+	display: flex;
+	gap: -10px;
+	font-size: 70px;
 }
 
+.forest-icon span {
+	margin-left: -55px;
+}
 .zone {
 	border: 1px solid rgb(93, 47, 4);
 	display: flex;

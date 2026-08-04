@@ -54,7 +54,6 @@ loadLocations();
 
 function displayLocations() {
 	const layer = document.getElementById("location-layer");
-	const positions = [];
 
 	locationsData.forEach((location) => {
 		const icon = document.createElement("div");
@@ -65,43 +64,40 @@ function displayLocations() {
 			icon.classList.add("forest-icon");
 
 			icon.innerHTML = `
-		<span>🌲</span>
-		<span>🌲</span>
-		<span>🌲</span>
-	`;
+				<span>🌲</span>
+				<span>🌲</span>
+				<span>🌲</span>
+			`;
 		} else {
 			icon.textContent = getLocationIcon(location.type);
 		}
 
-		let x;
-		let y;
-		let validPosition = false;
+		const zoneElement = document.querySelector(`[data-zone="${location.zone}"]`);
 
-		while (!validPosition) {
-			x = 10 + Math.random() * 74;
-			y = 10 + Math.random() * 80;
-
-			validPosition = true;
-
-			for (const pos of positions) {
-				const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
-
-				if (distance < 18) {
-					validPosition = false;
-					break;
-				}
-			}
+		if (zoneElement) {
+			zoneElement.appendChild(icon);
 		}
-
-		positions.push({ x, y });
-
-		icon.style.left = `${x}%`;
-		icon.style.top = `${y}%`;
-
-		layer.appendChild(icon);
 	});
 }
 
+function getZonePosition(zone) {
+	const zoneElement = document.querySelector(`[data-zone="${zone}"]`);
+
+	if (!zoneElement) {
+		console.error("Zone not found:", zone);
+		return { x: 0, y: 0 };
+	}
+
+	const map = document.getElementById("map");
+
+	const zoneRect = zoneElement.getBoundingClientRect();
+	const mapRect = map.getBoundingClientRect();
+
+	return {
+		x: ((zoneRect.left - mapRect.left + zoneRect.width / 2) / mapRect.width) * 100,
+		y: ((zoneRect.top - mapRect.top + zoneRect.height / 2) / mapRect.height) * 100,
+	};
+}
 function getLocationIcon(type) {
 	switch (type) {
 		case "forest":

@@ -50,7 +50,7 @@ h2 {
 	transform: translateY(-10px);
 	pointer-events: none;
 	opacity: 0.8;
-
+	
 }
 
 .forest-icon {
@@ -88,6 +88,11 @@ button {
 	cursor: pointer;
 	border: 2px solid;
 }
+button:hover {
+	background-color: rgb(145, 199, 134);
+	color: rgb(16, 57, 8);
+}
+
 .camera-btn.selected {
 	border: 3px solid rgb(53, 181, 27);
 }
@@ -97,6 +102,30 @@ button {
 	opacity: 0.5;
 	border-color: rgb(16, 57, 8);
 	background-color: rgb(145, 199, 134);
+}
+
+#new-game-btn {
+	margin-top: 20px;
+	margin-bottom: 30px;
+
+	padding: 0px;
+	font-size: 15px;
+
+	background-color: transparent;
+	color: black;
+
+	border: 2px solid rgb(0, 0, 0);
+	cursor: pointer;
+	transition: 0.2s ease;
+}
+
+#new-game-btn:hover {
+	background-color: rgb(145, 199, 134);
+	color: rgb(16, 57, 8);
+}
+
+#new-game-btn:active {
+	transform: scale(0.95);
 }
 
 #camera-logs {

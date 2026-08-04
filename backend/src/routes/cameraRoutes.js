@@ -12,6 +12,21 @@ router.get("/", async (req, res) => {
 	}
 });
 
+//RESET camera locations
+router.patch("/reset", async (req, res) => {
+	try {
+		await Camera.updateMany({}, { zone: null });
+
+		res.json({
+			message: "Cameras reset",
+		});
+	} catch (error) {
+		res.status(500).json({
+			error: error.message,
+		});
+	}
+});
+
 //UPDATE camera location
 router.patch("/:id", async (req, res) => {
 	try {

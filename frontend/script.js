@@ -6,9 +6,14 @@ let locationsData = [];
 const API_URL = "http://localhost:5000/api";
 const cameras = document.querySelectorAll(".camera-btn");
 const cameraButtons = document.querySelectorAll(".camera-btn");
+const newGameButton = document.getElementById("new-game-btn");
 const zones = document.querySelectorAll(".zone");
 
 async function loadCameras() {
+	zones.forEach((zone) => {
+		zone.textContent = zone.dataset.zone;
+		zone.dataset.camera = "";
+	});
 	try {
 		const response = await fetch(`${API_URL}/cameras`);
 		const cameras = await response.json();
@@ -48,9 +53,24 @@ async function loadLocations() {
 		console.error("Error loading locations:", error);
 	}
 }
-
 loadCameras();
 loadLocations();
+
+async function newGame() {
+	try {
+		await fetch(`${API_URL}/cameras/reset`, {
+			method: "PATCH",
+		});
+
+		await fetch(`${API_URL}/location-game/generate`, {
+			method: "POST",
+		});
+
+		window.location.reload();
+	} catch (error) {
+		console.error("Error starting new game:", error);
+	}
+}
 
 function displayLocations() {
 	const layer = document.getElementById("location-layer");
@@ -147,6 +167,13 @@ cameras.forEach((button) => {
 
 		button.classList.add("selected");
 	});
+});
+newGameButton.addEventListener("click", () => {
+	const confirmNewGame = confirm("Are you sure you want to start a new game? This will reset all camera placements and generate new locations.");
+
+	if (confirmNewGame) {
+		newGame();
+	}
 });
 
 zones.forEach((zone) => {

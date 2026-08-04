@@ -3,101 +3,88 @@ const Location = require("../models/Location");
 
 const locations = [
 	{
-		name: "House A3",
-		type: "House",
-		position: {
-			x: 100,
-			y: 100,
-		},
+		name: "House 1",
+		type: "house",
+		zone: null,
 	},
 	{
-		name: "House B1",
-		type: "House",
-		position: {
-			x: 250,
-			y: 100,
-		},
+		name: "House 2",
+		type: "house",
+		zone: null,
 	},
 
 	{
-		name: "House C2",
-		type: "House",
-		position: {
-			x: 400,
-			y: 100,
-		},
+		name: "House 3",
+		type: "house",
+		zone: null,
 	},
 
 	{
-		name: "House D4",
-		type: "House",
-		position: {
-			x: 550,
-			y: 100,
-		},
+		name: "House 4",
+		type: "house",
+		zone: null,
 	},
 
 	{
-		name: "House E5",
-		type: "House",
-		position: {
-			x: 700,
-			y: 100,
-		},
+		name: "House 5",
+		type: "house",
+		zone: null,
 	},
 
 	{
-		name: "House F6",
-		type: "House",
-		position: {
-			x: 850,
-			y: 100,
-		},
+		name: "House 6",
+		type: "house",
+		zone: null,
 	},
 
 	{
-		name: "House G7",
-		type: "House",
-		position: {
-			x: 1000,
-			y: 100,
-		},
+		name: "House 7",
+		type: "house",
+		zone: null,
 	},
 
 	{
-		name: "House H8",
-		type: "House",
-		position: {
-			x: 1150,
-			y: 100,
-		},
+		name: "House 8",
+		type: "house",
+		zone: null,
 	},
 
 	{
-		name: "House I9",
-		type: "House",
-		position: {
-			x: 1300,
-			y: 100,
-		},
+		name: "House 9",
+		type: "house",
+		zone: null,
 	},
 
 	{
 		name: "Supermarket",
 		type: "shop",
-		position: {
-			x: 1450,
-			y: 100,
-		},
+		zone: null,
 	},
 
 	{
 		name: "School",
 		type: "school",
-		position: {
-			x: 1600,
-			y: 100,
-		},
+		zone: null,
+	},
+	{
+		name: "Forest",
+		type: "forest",
+		zone: null,
+	},
+	{
+		name: "Police Station",
+		type: "police",
+		zone: null,
+	},
+	{
+		name: "Cemetery",
+		type: "cemetery",
+		zone: null,
+	},
+	{
+		name: "Clothing Store",
+		type: "shop",
+		zone: null,
 	},
 ];
 

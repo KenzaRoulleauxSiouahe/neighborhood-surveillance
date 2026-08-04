@@ -12,6 +12,7 @@ const cameraRoutes = require("./src/routes/cameraRoutes");
 const Camera = require("./src/models/Camera");
 
 const gameRoutes = require("./src/routes/gameRoutes");
+const locationGameRoutes = require("./src/routes/locationGameRoutes");
 
 const zoneRoutes = require("./src/routes/zoneRoutes");
 
@@ -26,6 +27,7 @@ app.use("/api/residents", residentRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/cameras", cameraRoutes);
 app.use("/api/game", gameRoutes);
+app.use("/api/location-game", locationGameRoutes);
 app.use("/api/zones", zoneRoutes);
 
 mongoose

@@ -1,6 +1,7 @@
 let camerasData = [];
 let selectedCamera = null;
 let cameraPositions = {};
+let locationsData = [];
 
 const API_URL = "http://localhost:5000/api";
 const cameras = document.querySelectorAll(".camera-btn");
@@ -35,8 +36,60 @@ async function loadCameras() {
 	}
 }
 
-loadCameras();
+async function loadLocations() {
+	try {
+		const response = await fetch(`${API_URL}/locations`);
+		const locations = await response.json();
+		locationsData = locations;
 
+		console.log("Loaded locations:", locationsData);
+		displayLocations();
+	} catch (error) {
+		console.error("Error loading locations:", error);
+	}
+}
+
+loadCameras();
+loadLocations();
+
+function displayLocations() {
+	const layer = document.getElementById("location-layer");
+
+	locationsData.forEach((location) => {
+		const icon = document.createElement("div");
+
+		icon.classList.add("location-icon");
+
+		icon.textContent = getLocationIcon(location.type);
+
+		const x = Math.random() * 85;
+		const y = Math.random() * 85;
+
+		icon.style.left = `${x}%`;
+		icon.style.top = `${y}%`;
+
+		layer.appendChild(icon);
+	});
+}
+
+function getLocationIcon(type) {
+	switch (type) {
+		case "forest":
+			return "🌲";
+		case "police":
+			return "👮🏻";
+		case "cemetery":
+			return "⚰️";
+		case "school":
+			return "🏫";
+		case "shop":
+			return "🛒";
+		case "house":
+			return "🏠";
+		default:
+			return "📍";
+	}
+}
 async function updateCameraZone(cameraId, zone) {
 	try {
 		const response = await fetch(`http://localhost:5000/api/cameras/${cameraId}`, {

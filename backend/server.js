@@ -12,7 +12,7 @@ const cameraRoutes = require("./src/routes/cameraRoutes");
 const Camera = require("./src/models/Camera");
 
 const gameRoutes = require("./src/routes/gameRoutes");
-const locationGameRoutes = require("./src/routes/locationGameRoutes");
+const locationGameRoutes = require("./src/routes/locationGameRoutes.js");
 
 const zoneRoutes = require("./src/routes/zoneRoutes");
 

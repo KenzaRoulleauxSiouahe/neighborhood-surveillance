@@ -78,8 +78,8 @@ function displayLocations() {
 		let validPosition = false;
 
 		while (!validPosition) {
-			x = 10 + Math.random() * 75;
-			y = 10 + Math.random() * 75;
+			x = 10 + Math.random() * 74;
+			y = 10 + Math.random() * 80;
 
 			validPosition = true;
 

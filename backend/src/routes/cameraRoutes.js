@@ -15,7 +15,12 @@ router.get("/", async (req, res) => {
 //RESET camera locations
 router.patch("/reset", async (req, res) => {
 	try {
-		await Camera.updateMany({}, { zone: null });
+		await Camera.updateMany(
+			{},
+			{
+				coveredZones: [],
+			},
+		);
 
 		res.json({
 			message: "Cameras reset",
@@ -27,19 +32,20 @@ router.patch("/reset", async (req, res) => {
 	}
 });
 
-//UPDATE camera location
-router.patch("/:id", async (req, res) => {
+router.patch("/:id/coverage", async (req, res) => {
 	try {
-		const camera = await Camera.findById(req.params.id);
+		const camera = await Camera.findByIdAndUpdate(
+			req.params.id,
+			{
+				coveredZones: req.body.coveredZones,
+			},
+			{ new: true },
+		);
 
-		camera.zone = req.body.zone;
-
-		await camera.save();
-
-		res.status(200).json(camera);
-	} catch (err) {
+		res.json(camera);
+	} catch (error) {
 		res.status(500).json({
-			error: err.message,
+			error: error.message,
 		});
 	}
 });

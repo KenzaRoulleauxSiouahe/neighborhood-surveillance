@@ -1,25 +1,20 @@
 const mongoose = require("mongoose");
 
 const cameraSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-    },
+	name: {
+		type: String,
+		required: true,
+	},
 
-    zone: { 
-        type: String,
-        default: null
-    },
+	color: {
+		type: String,
+		required: true,
+	},
 
-    active: {
-        type: Boolean,
-        default: false,
-    },
-
-    range: {
-        type: Number,
-        default: 1,
-    },
+	coveredZones: {
+		type: [String],
+		default: [],
+	},
 });
 
 module.exports = mongoose.model("Camera", cameraSchema);

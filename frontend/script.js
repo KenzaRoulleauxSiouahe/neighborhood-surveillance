@@ -2,37 +2,37 @@ let camerasData = [];
 let selectedCamera = null;
 let cameraPositions = {};
 let locationsData = [];
+let cameraCoverage = {};
+let zoneCameras = {};
 
 const API_URL = "http://localhost:5000/api";
+const cameraColors = {
+	"Camera 1": "green",
+	"Camera 2": "blue",
+	"Camera 3": "yellow",
+	"Camera 4": "red",
+};
 const cameras = document.querySelectorAll(".camera-btn");
 const cameraButtons = document.querySelectorAll(".camera-btn");
 const newGameButton = document.getElementById("new-game-btn");
 const zones = document.querySelectorAll(".zone");
 
 async function loadCameras() {
-	zones.forEach((zone) => {
-		zone.textContent = zone.dataset.zone;
-		zone.dataset.camera = "";
-	});
 	try {
 		const response = await fetch(`${API_URL}/cameras`);
 		const cameras = await response.json();
 		camerasData = cameras;
-
 		cameras.forEach((camera) => {
-			if (camera.zone) {
-				const zoneElement = document.querySelector(`[data-zone="${camera.zone}"]`);
-				if (zoneElement) {
-					zoneElement.textContent = `🎥 ${camera.name.replace("Camera ", "")}`;
-					zoneElement.dataset.camera = camera.name;
-					cameraPositions[camera.name] = camera.zone;
+			camera.coveredZones.forEach((zone) => {
+				const zoneElement = document.querySelector(`[data-zone="${zone}"]`);
 
-					const button = document.querySelector(`[data-camera="${camera.name}"]`);
-					if (button) {
-						button.classList.add("placed");
-					}
+				if (zoneElement) {
+					zoneElement.classList.add(`camera-${camera.color}`);
+
+					zoneCameras[zone] = camera.name;
+					cameraCoverage[camera.name] = zone;
 				}
-			}
+			});
 		});
 
 		console.log("Loaded cameras:", camerasData);
@@ -136,20 +136,23 @@ function getLocationIcon(type) {
 			return "📍";
 	}
 }
-async function updateCameraZone(cameraId, zone) {
+async function updateCameraCoverage(cameraId, coveredZones) {
 	try {
-		const response = await fetch(`http://localhost:5000/api/cameras/${cameraId}`, {
+		const response = await fetch(`${API_URL}/cameras/${cameraId}/coverage`, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ zone }),
+			body: JSON.stringify({
+				coveredZones: coveredZones,
+			}),
 		});
+
 		const updatedCamera = await response.json();
-		camerasData = camerasData.map((camera) => (camera._id === updatedCamera._id ? updatedCamera : camera));
+
 		console.log("Updated camera:", updatedCamera);
 	} catch (error) {
-		console.error("Error updating camera zone:", error);
+		console.error("Error updating camera coverage:", error);
 	}
 }
 
@@ -183,34 +186,56 @@ zones.forEach((zone) => {
 			return;
 		}
 
-		if (cameraPositions[selectedCamera.name]) {
-			const confirmMove = confirm(`${selectedCamera.name} is already placed at zone ${cameraPositions[selectedCamera.name]}. Do you want to move it to zone ${zone.dataset.zone}?`);
+		const zoneName = zone.dataset.zone;
+
+		const oldZone = cameraCoverage[selectedCamera.name];
+
+		if (oldZone === zoneName) {
+			return;
+		}
+
+		if (zoneCameras[zoneName] && zoneCameras[zoneName] !== selectedCamera.name) {
+			const otherCamera = zoneCameras[zoneName];
+
+			const confirmMove = confirm(`${otherCamera} is already placed at zone ${zoneName}. Do you want to move ${selectedCamera.name} to zone ${zoneName}?`);
 
 			if (!confirmMove) {
 				return;
 			}
 
-			const previousZone = document.querySelector(`[data-zone="${cameraPositions[selectedCamera.name]}"]`);
-			previousZone.textContent = previousZone.dataset.zone;
+			const otherCameraData = camerasData.find((camera) => camera.name === otherCamera);
 
-			previousZone.textContent = previousZone.dataset.zone;
+			if (otherCameraData) {
+				zone.classList.remove(`camera-${otherCameraData.color}`);
+			}
+
+			delete cameraCoverage[otherCamera];
+			delete zoneCameras[zoneName];
+			otherCameraData.coveredZones = [];
+
+			await updateCameraCoverage(otherCameraData._id, []);
 		}
 
-		if (zone.dataset.camera) {
-			alert(`${zone.dataset.camera} is already placed here. Choose another zone.`);
-			return;
+		if (oldZone) {
+			const oldZoneElement = document.querySelector(`[data-zone="${oldZone}"]`);
+
+			if (oldZoneElement) {
+				oldZoneElement.classList.remove(`camera-${selectedCamera.color}`);
+			}
+
+			delete zoneCameras[oldZone];
 		}
 
-		zone.textContent = `🎥 ${selectedCamera.name.replace("Camera ", "")}`;
+		// Add color immediately
+		zone.classList.add(`camera-${selectedCamera.color}`);
 
-		await updateCameraZone(selectedCamera._id, zone.dataset.zone);
-		zone.dataset.camera = selectedCamera.name;
+		cameraCoverage[selectedCamera.name] = zoneName;
+		zoneCameras[zoneName] = selectedCamera.name;
 
-		cameraPositions[selectedCamera.name] = zone.dataset.zone;
-		const button = document.querySelector(`[data-camera="${selectedCamera.name}"]`);
+		selectedCamera.coveredZones = [zoneName];
 
-		button.classList.add("placed");
+		await updateCameraCoverage(selectedCamera._id, selectedCamera.coveredZones);
 
-		console.log(selectedCamera.name, "placed at", zone.textContent);
+		console.log(selectedCamera.name, "is placed at", zoneName);
 	});
 });

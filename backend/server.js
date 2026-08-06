@@ -15,6 +15,7 @@ const gameRoutes = require("./src/routes/gameRoutes");
 const locationGameRoutes = require("./src/routes/locationGameRoutes.js");
 
 const zoneRoutes = require("./src/routes/zoneRoutes");
+const actionRoutes = require("./src/routes/actionRoutes");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/cameras", cameraRoutes);
 app.use("/api/game", gameRoutes);
 app.use("/api/location-game", locationGameRoutes);
 app.use("/api/zones", zoneRoutes);
+app.use("/api/actions", actionRoutes);
 
 mongoose
 	.connect("mongodb://localhost:27017/neighbourhood-surveillance")

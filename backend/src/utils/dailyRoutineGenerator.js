@@ -1,5 +1,40 @@
 const roleRoutines = require("./routineGenerator");
 
+function randomizeTime(time, variation = 10) {
+	let [hours, minutes] = time.split(":").map(Number);
+
+	const random = Math.floor(Math.random() * (variation * 2 + 1)) - variation;
+
+	minutes += random;
+
+	while (minutes < 0) {
+		hours--;
+		minutes += 60;
+	}
+
+	while (minutes >= 60) {
+		hours++;
+		minutes -= 60;
+	}
+
+	hours = (hours + 24) % 24;
+
+	return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+function addMinutes(time, amount) {
+	let [hours, minutes] = time.split(":").map(Number);
+
+	minutes += amount;
+
+	while (minutes >= 60) {
+		hours++;
+		minutes -= 60;
+	}
+
+	return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
 function generateDailyRoutine(resident) {
 	const routine = roleRoutines[resident.role];
 
@@ -14,13 +49,13 @@ function generateDailyRoutine(resident) {
 	if (routine.outsideVillage) {
 		return [
 			{
-				time: routine.start,
-				action: "Left the house",
+				time: randomizeTime(routine.start),
+				action: "Left home",
 				location: resident.house,
 			},
 
 			{
-				time: routine.end,
+				time: randomizeTime(routine.end),
 				action: "Returned home",
 				location: resident.house,
 			},
@@ -29,7 +64,7 @@ function generateDailyRoutine(resident) {
 
 	return [
 		{
-			time: routine.start,
+			time: randomizeTime(routine.start),
 			action: "Left the house",
 			location: resident.house,
 		},
@@ -41,7 +76,7 @@ function generateDailyRoutine(resident) {
 		},
 
 		{
-			time: routine.end,
+			time: randomizeTime(routine.end),
 			action: "Left",
 			location: routine.workplace,
 		},
@@ -52,19 +87,6 @@ function generateDailyRoutine(resident) {
 			location: resident.house,
 		},
 	];
-}
-
-function addMinutes(time, minutes) {
-	let [hours, mins] = time.split(":").map(Number);
-
-	mins += minutes;
-
-	while (mins >= 60) {
-		hours++;
-		mins -= 60;
-	}
-
-	return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
 }
 
 module.exports = generateDailyRoutine;

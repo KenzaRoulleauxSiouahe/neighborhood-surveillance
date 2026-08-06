@@ -58,15 +58,25 @@ loadLocations();
 
 async function newGame() {
 	try {
-		await fetch(`${API_URL}/cameras/reset`, {
-			method: "PATCH",
+		await fetch(`${API_URL}/game/start`, {
+			method: "POST",
 		});
 
 		await fetch(`${API_URL}/location-game/generate`, {
 			method: "POST",
 		});
 
-		window.location.reload();
+		locationsData = [];
+
+		const response = await fetch(`${API_URL}/locations`);
+		const locations = await response.json();
+
+		locationsData = locations;
+
+		document.querySelectorAll(".location-icon").forEach((icon) => {
+			icon.remove();
+		});
+		displayLocations();
 	} catch (error) {
 		console.error("Error starting new game:", error);
 	}

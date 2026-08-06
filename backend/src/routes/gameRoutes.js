@@ -2,12 +2,39 @@ const express = require("express");
 const router = express.Router();
 
 const Camera = require("../models/Camera");
+const Resident = require("../models/Resident");
+const chooseCultMembers = require("../utils/cultGenerator");
 
 router.post("/start", async (req, res) => {
 	try {
 		await Camera.deleteMany();
 
-		const cameras = await Camera.insertMany([{ name: "Camera 1" }, { name: "Camera 2" }, { name: "Camera 3" }, { name: "Camera 4" }]);
+		const cameras = await Camera.insertMany([
+			{ name: "Camera 1", color: "green" },
+			{ name: "Camera 2", color: "blue" },
+			{ name: "Camera 3", color: "yellow" },
+			{ name: "Camera 4", color: "red" },
+		]);
+
+		const cultMembers = await chooseCultMembers();
+
+		await Resident.updateMany({}, { isCultMember: false });
+
+		await Resident.updateMany(
+			{
+				_id: {
+					$in: cultMembers.map((member) => member._id),
+				},
+			},
+			{
+				isCultMember: true,
+			},
+		);
+
+		console.log(
+			"Cult members:",
+			cultMembers.map((member) => member.name),
+		);
 
 		res.status(201).json({
 			message: "Game started",

@@ -30,22 +30,22 @@ const residents = [
 	{
 		name: "Rosita Espinosa",
 		age: 35,
-		role: "Lawyer",
+		role: "Teacher",
 	},
 	{
 		name: "Glenn Rhee",
 		age: 27,
-		role: "Mechanic",
+		role: "Forestkeeper",
 	},
 	{
 		name: "Sasha Williams",
 		age: 39,
-		role: "Accountant",
+		role: "Teacher",
 	},
 	{
 		name: "Bob Stookey",
 		age: 40,
-		role: "Engineer",
+		role: "Cashier",
 	},
 	{
 		name: "Beth Jones",
@@ -55,7 +55,7 @@ const residents = [
 	{
 		name: "Eziekiel King",
 		age: 55,
-		role: "Zoo keeper",
+		role: "Gravekeeper",
 	},
 ];
 

@@ -1,4 +1,5 @@
 const roleRoutines = require("./routineGenerator");
+const generateAction = require("./actionGenerator");
 
 function randomizeTime(time, variation = 10) {
 	let [hours, minutes] = time.split(":").map(Number);
@@ -35,7 +36,17 @@ function addMinutes(time, amount) {
 	return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
-function generateDailyRoutine(resident) {
+function randomActivity() {
+	const chance = Math.random();
+
+	if (chance > 0.5) {
+		return null;
+	}
+
+	return generateAction(18, 19);
+}
+
+function generateDailyRoutine(resident, day) {
 	const routine = roleRoutines[resident.role];
 
 	if (!routine) {
@@ -46,7 +57,7 @@ function generateDailyRoutine(resident) {
 		return [];
 	}
 
-	if (routine.outsideVillage) {
+	if (routine.outsideVillage && routine.freeDays.includes(day)) {
 		return [
 			{
 				time: randomizeTime(routine.start),
@@ -62,15 +73,19 @@ function generateDailyRoutine(resident) {
 		];
 	}
 
-	return [
+	const leaveTime = randomizeTime(routine.start);
+
+	const arriveTime = addMinutes(leaveTime, 10 + Math.floor(Math.random() * 10));
+
+	const logs = [
 		{
-			time: randomizeTime(routine.start),
+			time: leaveTime,
 			action: "Left the house",
 			location: resident.house,
 		},
 
 		{
-			time: addMinutes(routine.start, 15),
+			time: randomizeTime(arriveTime, 5),
 			action: "Entered",
 			location: routine.workplace,
 		},
@@ -80,13 +95,30 @@ function generateDailyRoutine(resident) {
 			action: "Left",
 			location: routine.workplace,
 		},
-
-		{
-			time: addMinutes(routine.end, 15),
-			action: "Returned home",
-			location: resident.house,
-		},
 	];
+
+	const activity = randomActivity();
+
+	if (activity) {
+		logs.push({
+			time: activity.time,
+			action: activity.action,
+			location: activity.location,
+		});
+	}
+
+	logs.push({
+		time: randomizeTime(addMinutes(routine.end, 30), 10),
+		action: "Returned home",
+		location: resident.house,
+	});
+
+	return logs.sort((a, b) => {
+		const timeA = a.time.split(":").map(Number);
+		const timeB = b.time.split(":").map(Number);
+
+		return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
+	});
 }
 
 module.exports = generateDailyRoutine;

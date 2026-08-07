@@ -1,5 +1,4 @@
 const generateDailyRoutine = require("./dailyRoutineGenerator");
-const generateWeekLogs = require("./weekLogGenerator");
 
 const daryl = {
 	name: "Daryl Dixon",

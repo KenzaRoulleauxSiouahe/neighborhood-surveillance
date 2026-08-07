@@ -53,8 +53,40 @@ async function loadLocations() {
 		console.error("Error loading locations:", error);
 	}
 }
+
+async function loadMurderSpots() {
+	try {
+		const response = await fetch(`${API_URL}/murder-spots`);
+
+		const murders = await response.json();
+
+		console.log("Loaded murder spots:", murders);
+
+		murders.forEach((murder) => {
+			const zoneElement = document.querySelector(`[data-zone="${murder.zone}"]`);
+
+			if (zoneElement) {
+				const murderLayer = zoneElement.querySelector(".murder-layer");
+
+				const skull = document.createElement("div");
+
+				skull.classList.add("murder-icon");
+
+				skull.textContent = "☠️";
+
+				skull.title = `Previous victim: ${murder.victim}`;
+
+				murderLayer.appendChild(skull);
+			}
+		});
+	} catch (error) {
+		console.error("Error loading murder spots:", error);
+	}
+}
+
 loadCameras();
 loadLocations();
+loadMurderSpots();
 
 async function newGame() {
 	try {

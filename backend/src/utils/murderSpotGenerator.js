@@ -2,19 +2,25 @@ const zones = ["A1", "A2", "A3", "A4", "A5", "B1", "B2", "B3", "B4", "B5", "C1",
 
 const victims = ["Negan", "Abraham Ford", "Carl Grimes", "Shane Walsh", "Andrea", "Enid"];
 
+const MurderSpot = require("../models/MurderSpot");
+
 function randomChoice(array) {
 	return array[Math.floor(Math.random() * array.length)];
 }
 
-function generateMurderSpots(gameDate) {
+async function generateMurderSpots(gameDate) {
 	const availableVictims = [...victims];
+
+	const murderDays = [8, 4];
 
 	const murders = [];
 
-	for (let i = 2; i >= 1; i--) {
+	await MurderSpot.deleteMany();
+
+	murderDays.forEach((days) => {
 		const murderDate = new Date(gameDate);
 
-		murderDate.setDate(murderDate.getDate() - i * 4);
+		murderDate.setDate(murderDate.getDate() - days);
 
 		const victimIndex = Math.floor(Math.random() * availableVictims.length);
 
@@ -25,7 +31,9 @@ function generateMurderSpots(gameDate) {
 			victim: victim,
 			date: murderDate,
 		});
-	}
+	});
+
+	await MurderSpot.insertMany(murders);
 
 	return murders;
 }

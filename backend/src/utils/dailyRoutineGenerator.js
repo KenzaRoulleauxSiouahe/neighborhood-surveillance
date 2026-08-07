@@ -1,4 +1,5 @@
 const roleRoutines = require("./routineGenerator");
+const Location = require("../models/Location");
 const generateAction = require("./actionGenerator");
 
 function randomizeTime(time, variation = 10) {
@@ -46,8 +47,11 @@ function randomActivity() {
 	return generateAction(18, 19);
 }
 
-function generateDailyRoutine(resident, day) {
+async function generateDailyRoutine(resident, day) {
 	const routine = roleRoutines[resident.role];
+	const houseLocation = await Location.findOne({
+		name: resident.house,
+	});
 
 	if (!routine) {
 		return [];
@@ -63,12 +67,14 @@ function generateDailyRoutine(resident, day) {
 				time: randomizeTime(routine.start),
 				action: "Left home",
 				location: resident.house,
+				zone: houseLocation.zone,
 			},
 
 			{
 				time: randomizeTime(routine.end),
 				action: "Returned home",
 				location: resident.house,
+				zone: houseLocation.zone,
 			},
 		];
 	}
@@ -82,18 +88,21 @@ function generateDailyRoutine(resident, day) {
 			time: leaveTime,
 			action: "Left the house",
 			location: resident.house,
+			zone: houseLocation.zone,
 		},
 
 		{
 			time: randomizeTime(arriveTime, 5),
 			action: "Entered",
-			location: routine.workplace,
+			location: resident.house,
+			zone: houseLocation.zone,
 		},
 
 		{
 			time: randomizeTime(routine.end),
 			action: "Left",
-			location: routine.workplace,
+			location: resident.house,
+			zone: houseLocation.zone,
 		},
 	];
 
@@ -111,6 +120,7 @@ function generateDailyRoutine(resident, day) {
 		time: randomizeTime(addMinutes(routine.end, 30), 10),
 		action: "Returned home",
 		location: resident.house,
+		zone: houseLocation.zone,
 	});
 
 	return logs.sort((a, b) => {

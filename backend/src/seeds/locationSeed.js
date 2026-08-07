@@ -14,7 +14,7 @@ const locations = [
 	},
 
 	{
-		name: "Daryl's house",
+		name: "Daryl's House",
 		type: "house",
 		zone: null,
 	},

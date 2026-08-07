@@ -56,7 +56,7 @@ h2 {
 	left: 50%;
 	transform: translate(-50%, -60%);
 
-	pointer-events: none;
+	cursor: pointer;
 	opacity: 1;
 }
 
@@ -69,8 +69,9 @@ h2 {
 	bottom: 5px;
 	right: 5px;
 
-	pointer-events: none;
+	cursor: pointer;
 
+	pointer-events: auto;
 	animation: pulse 1.5s infinite;
 
 	text-shadow:
@@ -197,4 +198,26 @@ button:hover {
 
 .camera-red {
 	background-color: rgba(255, 0, 0, 0.25);
+}
+
+#legend {
+	margin-top: 30px;
+	padding: 15px;
+
+	width: 150px;
+
+	border: 2px solid rgb(93, 47, 4);
+	background-color: rgba(255, 255, 255, 0.7);
+
+	text-align: left;
+}
+
+#legend h3 {
+	margin-top: 0;
+	text-align: center;
+}
+
+#legend div {
+	margin: 8px 0;
+	font-size: 16px;
 }

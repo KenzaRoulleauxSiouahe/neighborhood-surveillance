@@ -74,7 +74,7 @@ async function loadMurderSpots() {
 
 				skull.textContent = "☠️";
 
-				skull.title = `Previous victim: ${murder.victim}`;
+				skull.setAttribute("title", `Murder scene - Victim: ${murder.victim}`);
 
 				murderLayer.appendChild(skull);
 			}
@@ -130,8 +130,11 @@ function displayLocations() {
 				<span>🌲</span>
 				<span>🌲</span>
 			`;
+			icon.title = location.name;
 		} else {
 			icon.textContent = getLocationIcon(location.type);
+
+			icon.title = location.name;
 		}
 
 		const zoneElement = document.querySelector(`[data-zone="${location.zone}"]`);

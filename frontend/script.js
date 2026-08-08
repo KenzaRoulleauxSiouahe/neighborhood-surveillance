@@ -50,14 +50,32 @@ async function loadBriefingVictims() {
 		console.error("Error loading briefing victims:", error);
 	}
 }
-beginGameButton.addEventListener("click", () => {
+
+function showBriefing() {
+	briefingScreen.style.display = "flex";
+}
+
+function hideBriefing() {
 	briefingScreen.style.display = "none";
+	sessionStorage.setItem("briefingSeen", "true");
+}
+
+beginGameButton.addEventListener("click", () => {
+	hideBriefing();
 });
 async function loadCameras() {
 	try {
+		document.querySelectorAll(".zone").forEach((zone) => {
+			zone.classList.remove("camera-green", "camera-blue", "camera-yellow", "camera-red");
+		});
+
+		cameraCoverage = {};
+		zoneCameras = {};
+
 		const response = await fetch(`${API_URL}/cameras`);
 		const cameras = await response.json();
 		camerasData = cameras;
+
 		cameras.forEach((camera) => {
 			camera.coveredZones.forEach((zone) => {
 				const zoneElement = document.querySelector(`[data-zone="${zone}"]`);
@@ -125,11 +143,17 @@ loadLocations();
 loadMurderSpots();
 loadBriefingVictims();
 
+if (sessionStorage.getItem("briefingSeen") === "true") {
+	hideBriefing();
+}
+
 async function newGame() {
 	try {
 		await fetch(`${API_URL}/game/start`, {
 			method: "POST",
 		});
+
+		await loadCameras();
 
 		await fetch(`${API_URL}/location-game/generate`, {
 			method: "POST",
@@ -152,6 +176,9 @@ async function newGame() {
 		});
 
 		await loadMurderSpots();
+		await loadBriefingVictims();
+		showBriefing();
+		sessionStorage.removeItem("briefingSeen");
 	} catch (error) {
 		console.error("Error starting new game:", error);
 	}

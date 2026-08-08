@@ -4,6 +4,7 @@ let cameraPositions = {};
 let locationsData = [];
 let cameraCoverage = {};
 let zoneCameras = {};
+let residentsData = [];
 
 const API_URL = "http://localhost:5000/api";
 const cameraColors = {
@@ -19,6 +20,10 @@ const cameras = document.querySelectorAll(".camera-btn");
 const cameraButtons = document.querySelectorAll(".camera-btn");
 const newGameButton = document.getElementById("new-game-btn");
 const zones = document.querySelectorAll(".zone");
+const residentFilesButton = document.getElementById("resident-files-btn");
+const residentFileOverlay = document.getElementById("resident-file-overlay");
+const closeResidentFileButton = document.getElementById("close-resident-file");
+const residentTabs = document.getElementById("resident-tabs");
 
 async function loadBriefingVictims() {
 	try {
@@ -354,3 +359,84 @@ zones.forEach((zone) => {
 		console.log(selectedCamera.name, "is placed at", zoneName);
 	});
 });
+
+residentFilesButton.addEventListener("click", async () => {
+	residentFileOverlay.style.display = "flex";
+
+	await loadResidents();
+});
+
+closeResidentFileButton.addEventListener("click", () => {
+	residentFileOverlay.style.display = "none";
+});
+
+async function loadResidents() {
+	try {
+		const response = await fetch(`${API_URL}/residents`);
+
+		residentsData = await response.json();
+
+		console.log("Loaded residents:", residentsData);
+
+		displayResidentTabs();
+
+		if (residentsData.length > 0) {
+			displayResident(residentsData[0]);
+		}
+	} catch (error) {
+		console.error("Error loading residents:", error);
+	}
+}
+
+function displayResidentTabs() {
+	residentTabs.innerHTML = "";
+
+	residentsData.forEach((resident, index) => {
+		const tab = document.createElement("button");
+
+		tab.classList.add("resident-tab");
+
+		tab.textContent = resident.name;
+
+		tab.addEventListener("click", () => {
+			document.querySelectorAll(".resident-tab").forEach((button) => {
+				button.classList.remove("selected");
+			});
+
+			tab.classList.add("selected");
+
+			displayResident(resident);
+		});
+
+		residentTabs.appendChild(tab);
+
+		if (index === 0) {
+			tab.classList.add("selected");
+		}
+	});
+}
+function displayResident(resident) {
+	document.getElementById("resident-name").textContent = resident.name;
+
+	document.getElementById("resident-name-info").textContent = resident.name;
+
+	document.getElementById("resident-age").textContent = resident.age;
+
+	document.getElementById("resident-role").textContent = resident.role;
+
+	document.getElementById("resident-house").textContent = getResidentLocation(resident.house);
+
+	document.getElementById("resident-working-hours").textContent = resident.workingHours || "Unknown";
+
+	document.getElementById("resident-days-off").textContent = resident.daysOff && resident.daysOff.length > 0 ? resident.daysOff.join(", ") : "None";
+}
+
+function getResidentLocation(houseName) {
+	const location = locationsData.find((location) => location.name === houseName);
+
+	if (!location) {
+		return "Unknown";
+	}
+
+	return `${location.name} — ${location.zone}`;
+}

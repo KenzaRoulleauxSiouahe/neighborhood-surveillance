@@ -9,7 +9,7 @@ function shuffle(array) {
 }
 
 async function generateMurderSpots(gameDate) {
-	const availableVictims = [...victims];
+	const availableVictims = shuffle([...victims]);
 	const availableZones = shuffle([...zones]);
 
 	const murderDays = [12, 8, 4];

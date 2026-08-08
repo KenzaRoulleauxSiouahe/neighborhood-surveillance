@@ -12,11 +12,47 @@ const cameraColors = {
 	"Camera 3": "yellow",
 	"Camera 4": "red",
 };
+
+const briefingScreen = document.getElementById("briefing-screen");
+const beginGameButton = document.getElementById("begin-game-btn");
 const cameras = document.querySelectorAll(".camera-btn");
 const cameraButtons = document.querySelectorAll(".camera-btn");
 const newGameButton = document.getElementById("new-game-btn");
 const zones = document.querySelectorAll(".zone");
 
+async function loadBriefingVictims() {
+	try {
+		const response = await fetch(`${API_URL}/murder-spots`);
+		const murders = await response.json();
+
+		murders.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+		murders.forEach((murder, index) => {
+			const victimNumber = index + 1;
+
+			const nameElement = document.getElementById(`victim-${victimNumber}-name`);
+
+			const dateElement = document.getElementById(`victim-${victimNumber}-date`);
+
+			if (nameElement && dateElement) {
+				nameElement.textContent = murder.victim;
+
+				const date = new Date(murder.date);
+
+				dateElement.textContent = date.toLocaleDateString("en-GB", {
+					day: "numeric",
+					month: "long",
+					year: "numeric",
+				});
+			}
+		});
+	} catch (error) {
+		console.error("Error loading briefing victims:", error);
+	}
+}
+beginGameButton.addEventListener("click", () => {
+	briefingScreen.style.display = "none";
+});
 async function loadCameras() {
 	try {
 		const response = await fetch(`${API_URL}/cameras`);
@@ -87,6 +123,7 @@ async function loadMurderSpots() {
 loadCameras();
 loadLocations();
 loadMurderSpots();
+loadBriefingVictims();
 
 async function newGame() {
 	try {

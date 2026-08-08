@@ -109,6 +109,12 @@ async function newGame() {
 			icon.remove();
 		});
 		displayLocations();
+
+		document.querySelectorAll(".murder-icon").forEach((icon) => {
+			icon.remove();
+		});
+
+		await loadMurderSpots();
 	} catch (error) {
 		console.error("Error starting new game:", error);
 	}

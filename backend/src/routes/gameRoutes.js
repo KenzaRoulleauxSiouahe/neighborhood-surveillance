@@ -5,6 +5,9 @@ const Camera = require("../models/Camera");
 const Resident = require("../models/Resident");
 const chooseCultMembers = require("../utils/cultGenerator");
 
+const generateMurderSpots = require("../utils/murderSpotGenerator");
+const MurderSpot = require("../models/MurderSpot");
+
 router.post("/start", async (req, res) => {
 	try {
 		await Camera.deleteMany();
@@ -40,6 +43,14 @@ router.post("/start", async (req, res) => {
 			message: "Game started",
 			cameras: cameras,
 		});
+
+		await MurderSpot.deleteMany();
+
+		const gameDate = new Date();
+
+		const murders = await generateMurderSpots(gameDate);
+
+		console.log("Murder spots:", murders);
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}

@@ -12,7 +12,7 @@ const residents = [
 		name: "Maggie Greene",
 		house: "Maggie and Glenn's House",
 		age: 27,
-		role: "Shop owner",
+		role: "Shop Owner",
 	},
 	{
 		name: "Daryl Dixon",
@@ -42,7 +42,7 @@ const residents = [
 		name: "Glenn Rhee",
 		house: "Maggie and Glenn's House",
 		age: 27,
-		role: "Forestkeeper",
+		role: "Forest Keeper",
 	},
 	{
 		name: "Sasha Williams",
@@ -66,7 +66,7 @@ const residents = [
 		name: "Eziekiel King",
 		house: "Eziekiel's House",
 		age: 55,
-		role: "Gravekeeper",
+		role: "Grave Keeper",
 	},
 ];
 

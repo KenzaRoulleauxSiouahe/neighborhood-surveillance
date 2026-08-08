@@ -11,7 +11,7 @@ function randomChoice(array) {
 async function generateMurderSpots(gameDate) {
 	const availableVictims = [...victims];
 
-	const murderDays = [8, 4];
+	const murderDays = [12, 8, 4];
 
 	const murders = [];
 

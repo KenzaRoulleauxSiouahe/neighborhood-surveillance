@@ -1,6 +1,7 @@
 const roleRoutines = require("./routineGenerator");
 const Location = require("../models/Location");
 const generateAction = require("./actionGenerator");
+const generateSuspiciousActivity = require("./suspiciousActivityGenerator");
 
 function randomizeTime(time, variation = 10) {
 	let [hours, minutes] = time.split(":").map(Number);
@@ -37,92 +38,112 @@ function addMinutes(time, amount) {
 	return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
-function randomActivity() {
+function randomActivity(startHour, endHour) {
 	const chance = Math.random();
 
 	if (chance > 0.5) {
-		return null;
+		return [];
 	}
 
-	return generateAction(18, 19);
+	return generateAction(startHour, endHour);
 }
 
-async function generateDailyRoutine(resident, day) {
+async function generateDailyRoutine(resident, day, murderSpots = []) {
 	const routine = roleRoutines[resident.role];
 	const houseLocation = await Location.findOne({
 		name: resident.house,
 	});
 
-	if (!routine) {
+	if (!routine || !houseLocation) {
 		return [];
 	}
 
-	if (!routine.workplace) {
-		return [];
-	}
+	const logs = [];
 
-	if (routine.outsideVillage && routine.freeDays.includes(day)) {
-		return [
-			{
-				time: randomizeTime(routine.start),
-				action: "Left home",
-				location: resident.house,
-				zone: houseLocation.zone,
-			},
+	if (routine.freeDays?.includes(day)) {
+		const activity = randomActivity(12, 20);
 
-			{
-				time: randomizeTime(routine.end),
-				action: "Returned home",
-				location: resident.house,
-				zone: houseLocation.zone,
-			},
-		];
-	}
+		logs.push(
+			...activity.map((item) => ({
+				...item,
+				suspicious: false,
+			})),
+		);
+	} else if (routine.outsideVillage) {
+		logs.push({
+			time: randomizeTime(routine.start),
+			action: "Left home",
+			location: resident.house,
+			zone: houseLocation.zone,
+			suspicious: false,
+		});
 
-	const leaveTime = randomizeTime(routine.start);
+		logs.push({
+			time: randomizeTime(routine.end),
+			action: "Returned home",
+			location: resident.house,
+			zone: houseLocation.zone,
+			suspicious: false,
+		});
+	} else if (routine.workplace) {
+		const leaveTime = randomizeTime(routine.start);
 
-	const arriveTime = addMinutes(leaveTime, 10 + Math.floor(Math.random() * 10));
+		const arriveTime = addMinutes(leaveTime, 10 + Math.floor(Math.random() * 10));
 
-	const logs = [
-		{
+		logs.push({
 			time: leaveTime,
 			action: "Left the house",
 			location: resident.house,
 			zone: houseLocation.zone,
-		},
+			suspicious: false,
+		});
 
-		{
+		logs.push({
 			time: randomizeTime(arriveTime, 5),
 			action: "Entered",
-			location: resident.house,
-			zone: houseLocation.zone,
-		},
+			location: routine.workplace,
+			suspicious: false,
+		});
 
-		{
+		logs.push({
 			time: randomizeTime(routine.end),
 			action: "Left",
+			location: routine.workplace,
+			suspicious: false,
+		});
+
+		const returnTime = addMinutes(routine.end, 30);
+
+		logs.push({
+			time: randomizeTime(returnTime, 10),
+			action: "Returned home",
 			location: resident.house,
 			zone: houseLocation.zone,
-		},
-	];
-
-	const activity = randomActivity();
-
-	if (activity) {
-		logs.push({
-			time: activity.time,
-			action: activity.action,
-			location: activity.location,
+			suspicious: false,
 		});
+
+		const endHour = Number(routine.end.split(":")[0]);
+
+		const activity = randomActivity(endHour, endHour + 1);
+
+		logs.push(
+			...activity.map((item) => ({
+				...item,
+				suspicious: false,
+			})),
+		);
 	}
+	if (resident.isCultMember && murderSpots.length > 0) {
+		const chance = Math.random();
 
-	logs.push({
-		time: randomizeTime(addMinutes(routine.end, 30), 10),
-		action: "Returned home",
-		location: resident.house,
-		zone: houseLocation.zone,
-	});
+		if (chance < 0.35) {
+			const suspiciousActivity = generateSuspiciousActivity(murderSpots);
 
+			if (suspiciousActivity) {
+				logs.push(suspiciousActivity);
+			}
+		}
+	}
 	return logs.sort((a, b) => {
 		const timeA = a.time.split(":").map(Number);
 		const timeB = b.time.split(":").map(Number);

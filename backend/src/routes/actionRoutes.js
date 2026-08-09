@@ -3,29 +3,27 @@ const router = express.Router();
 
 const Resident = require("../models/Resident");
 const Log = require("../models/Log");
-const generateDailyRoutine = require("../utils/dailyRoutineGenerator");
+const Game = require("../models/Game");
+const generateDailyLogs = require("../utils/dailyLogGenerator");
 
 router.post("/generate", async (req, res) => {
 	try {
 		const residents = await Resident.find();
 
-		const logs = [];
+		const game = await Game.findOne({
+			status: "active",
+		});
 
-		for (const resident of residents) {
-			const routine = generateDailyRoutine(resident);
-
-			for (const action of routine) {
-				logs.push({
-					resident: resident.name,
-					day: "Monday",
-					date: new Date(),
-					time: action.time,
-					action: action.action,
-					location: action.location,
-				});
-			}
+		if (!game) {
+			return res.status(400).json({
+				error: "No active game found.",
+			});
 		}
-		logs.sort((a, b) => a.time.localeCompare(b.time));
+
+		const logs = await generateDailyLogs(residents, game.currentDate);
+
+		await Log.deleteMany();
+
 		await Log.insertMany(logs);
 
 		res.json(logs);

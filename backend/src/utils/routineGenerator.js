@@ -16,7 +16,7 @@ const roleRoutines = {
 	},
 
 	"Forest Keeper": {
-		workplace: "forest",
+		workplace: "Forest",
 		outsideVillage: false,
 		start: "05:00",
 		end: "10:30",
@@ -58,7 +58,7 @@ const roleRoutines = {
 	},
 
 	"Shop Owner": {
-		workplace: "clothing store",
+		workplace: "Clothing Store",
 		outsideVillage: false,
 		start: "09:00",
 		end: "18:00",

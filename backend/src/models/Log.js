@@ -6,6 +6,11 @@ const logSchema = new mongoose.Schema({
 		required: true,
 	},
 
+	camera: {
+		type: String,
+		default: null,
+	},
+
 	day: {
 		type: String,
 		required: true,

@@ -156,6 +156,7 @@ loadCameras();
 loadLocations();
 loadMurderSpots();
 loadBriefingVictims();
+resumeInvestigation();
 
 if (sessionStorage.getItem("briefingSeen") === "true") {
 	hideBriefing();
@@ -163,6 +164,35 @@ if (sessionStorage.getItem("briefingSeen") === "true") {
 
 async function newGame() {
 	try {
+		investigationRunning = false;
+
+		if (investigationTimer) {
+			clearInterval(investigationTimer);
+			investigationTimer = null;
+		}
+
+		if (gameClockInterval) {
+			clearInterval(gameClockInterval);
+			gameClockInterval = null;
+		}
+
+		investigationStartTime = null;
+		gameStartRealTime = null;
+
+		const logsContainer = document.getElementById("logs");
+
+		if (logsContainer) {
+			logsContainer.innerHTML = "<p>No activity yet...</p>";
+		}
+
+		const gameTime = document.getElementById("game-time");
+
+		if (gameTime) {
+			gameTime.textContent = "00:00:00";
+		}
+
+		startInvestigationButton.disabled = true;
+
 		await fetch(`${API_URL}/game/start`, {
 			method: "POST",
 		});
@@ -503,7 +533,7 @@ startInvestigationButton.addEventListener("click", async () => {
 	startInvestigationButton.disabled = true;
 
 	console.log("Investigation started.");
-	startGameClock();
+	
 
 	try {
 		const response = await fetch(`${API_URL}/actions/generate`, {
@@ -522,6 +552,16 @@ startInvestigationButton.addEventListener("click", async () => {
 
 		console.log("Visible camera logs:", visibleLogs);
 
+		const gameResponse = await fetch(`${API_URL}/game/active`);
+
+		if (!gameResponse.ok) {
+			throw new Error("Could not find active game.");
+		}
+
+		const game = await gameResponse.json();
+
+		startGameClock(game.investigationStartedAt);
+
 		investigationStartTime = Date.now();
 
 		const gameMinutesPerSecond = 10;
@@ -534,24 +574,36 @@ startInvestigationButton.addEventListener("click", async () => {
 			const elapsedGameMinutes = elapsedSeconds * gameMinutesPerSecond;
 
 			const hours = Math.floor(elapsedGameMinutes / 60);
+
 			const minutes = Math.floor(elapsedGameMinutes % 60);
 
 			const currentGameMinutes = hours * 60 + minutes;
+
 			while (displayedLogIndex < visibleLogs.length) {
 				const log = visibleLogs[displayedLogIndex];
+
 				const [logHours, logMinutes] = log.time.split(":").map(Number);
+
 				const logGameMinutes = logHours * 60 + logMinutes;
+
 				if (logGameMinutes > currentGameMinutes) {
 					break;
 				}
+
 				displayInvestigationLog(log);
+
 				displayedLogIndex++;
 			}
+
 			console.log(`Investigation time: ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`);
+
 			if (elapsedGameMinutes >= 24 * 60) {
 				clearInterval(investigationTimer);
+
 				investigationRunning = false;
+
 				console.log("Investigation day finished.");
+
 				startInvestigationButton.disabled = true;
 			}
 		}, 1000);
@@ -564,12 +616,15 @@ startInvestigationButton.addEventListener("click", async () => {
 	}
 });
 
-function startGameClock() {
+function startGameClock(startedAt) {
 	if (gameClockInterval) {
 		clearInterval(gameClockInterval);
 	}
-	gameStartRealTime = Date.now();
+
+	gameStartRealTime = new Date(startedAt).getTime();
+
 	updateGameClock();
+
 	gameClockInterval = setInterval(() => {
 		updateGameClock();
 	}, 50);
@@ -584,14 +639,122 @@ function updateGameClock() {
 	if (!gameStartRealTime) {
 		return;
 	}
+
 	const realElapsedSeconds = (Date.now() - gameStartRealTime) / 1000;
-	const totalGameMinutes = realElapsedSeconds * GAME_MINUTES_PER_REAL_SECOND;
-	const hours = Math.floor(totalGameMinutes / 60);
-	const minutes = Math.floor(totalGameMinutes % 60);
-	const seconds = Math.floor((totalGameMinutes % 1) * 60);
-	const formattedTime = `${String(hours).padStart(2, "0")}:` + `${String(minutes).padStart(2, "0")}:` + `${String(seconds).padStart(2, "0")}`;
-	document.getElementById("game-time").textContent = formattedTime;
+
+	const totalGameMinutes = realElapsedSeconds * 10;
+
 	if (totalGameMinutes >= 24 * 60) {
 		stopGameClock();
+
+		document.getElementById("game-time").textContent = "24:00:00";
+
+		return;
 	}
+
+	const hours = Math.floor(totalGameMinutes / 60) % 24;
+
+	const minutes = Math.floor(totalGameMinutes % 60);
+
+	const seconds = Math.floor((realElapsedSeconds * 60) % 60);
+
+	const formattedTime = `${String(hours).padStart(2, "0")}:` + `${String(minutes).padStart(2, "0")}:` + `${String(seconds).padStart(2, "0")}`;
+
+	document.getElementById("game-time").textContent = formattedTime;
+}
+
+async function resumeInvestigation() {
+	try {
+		const response = await fetch(`${API_URL}/game/active`);
+
+		if (!response.ok) {
+			console.log("No active investigation.");
+			return;
+		}
+
+		const game = await response.json();
+
+		console.log("Active game:", game);
+
+		if (game.investigationRunning && game.investigationStartedAt) {
+			console.log("Resuming investigation clock...");
+
+			startGameClock(game.investigationStartedAt);
+
+			const dayElement = document.getElementById("investigation-day");
+
+			if (dayElement) {
+				dayElement.textContent = `INVESTIGATION DAY ${game.investigationDay}`;
+			}
+
+			const logsResponse = await fetch(`${API_URL}/actions/logs`);
+
+			if (!logsResponse.ok) {
+				throw new Error("Failed to load saved investigation logs.");
+			}
+
+			const logs = await logsResponse.json();
+			console.log("Saved logs:", logs);
+
+			const visibleLogs = logs.filter((log) => log.camera !== null);
+
+			console.log("Visible saved logs:", visibleLogs);
+
+			startInvestigationLogPlayback(visibleLogs, game.investigationStartedAt);
+		}
+	} catch (error) {
+		console.error("Error resuming investigation:", error);
+	}
+}
+
+function startInvestigationLogPlayback(visibleLogs, investigationStartedAt) {
+	if (investigationTimer) {
+		clearInterval(investigationTimer);
+	}
+
+	const logsContainer = document.getElementById("logs");
+
+	logsContainer.innerHTML = "";
+
+	const gameStartTime = new Date(investigationStartedAt).getTime();
+
+	let displayedLogIndex = 0;
+
+	function checkLogs() {
+		const elapsedRealSeconds = (Date.now() - gameStartTime) / 1000;
+
+		const elapsedGameMinutes = elapsedRealSeconds * 10;
+
+		const currentGameMinutes = Math.floor(elapsedGameMinutes);
+
+		while (displayedLogIndex < visibleLogs.length) {
+			const log = visibleLogs[displayedLogIndex];
+
+			const [logHours, logMinutes] = log.time.split(":").map(Number);
+
+			const logGameMinutes = logHours * 60 + logMinutes;
+
+			if (logGameMinutes > currentGameMinutes) {
+				break;
+			}
+
+			displayInvestigationLog(log);
+
+			displayedLogIndex++;
+		}
+
+		if (elapsedGameMinutes >= 24 * 60) {
+			clearInterval(investigationTimer);
+
+			investigationRunning = false;
+
+			console.log("Investigation day finished.");
+
+			return;
+		}
+	}
+
+	checkLogs();
+
+	investigationTimer = setInterval(checkLogs, 1000);
 }

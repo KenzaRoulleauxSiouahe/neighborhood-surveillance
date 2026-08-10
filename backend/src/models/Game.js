@@ -21,6 +21,16 @@ const gameSchema = new mongoose.Schema({
 		default: 1,
 	},
 
+	investigationStartedAt: {
+		type: Date,
+		default: null,
+	},
+
+	investigationRunning: {
+		type: Boolean,
+		default: false,
+	},
+
 	status: {
 		type: String,
 		enum: ["active", "won", "lost"],

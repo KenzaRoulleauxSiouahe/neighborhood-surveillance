@@ -9,9 +9,11 @@ const chooseCultMembers = require("../utils/cultGenerator");
 
 const generateMurderSpots = require("../utils/murderSpotGenerator");
 const MurderSpot = require("../models/MurderSpot");
+const Log = require("../models/Log");
 
 router.post("/start", async (req, res) => {
 	try {
+		await Log.deleteMany();
 		await Camera.deleteMany();
 
 		const cameras = await Camera.insertMany([
@@ -74,6 +76,26 @@ router.post("/start", async (req, res) => {
 		});
 	} catch (err) {
 		res.status(500).json({ error: err.message });
+	}
+});
+
+router.get("/active", async (req, res) => {
+	try {
+		const game = await Game.findOne({
+			status: "active",
+		});
+
+		if (!game) {
+			return res.status(404).json({
+				error: "No active game found.",
+			});
+		}
+
+		res.json(game);
+	} catch (error) {
+		res.status(500).json({
+			error: error.message,
+		});
 	}
 });
 

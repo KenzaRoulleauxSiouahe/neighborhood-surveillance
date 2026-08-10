@@ -16,6 +16,11 @@ const gameSchema = new mongoose.Schema({
 		required: true,
 	},
 
+	investigationDay: {
+		type: Number,
+		default: 1,
+	},
+
 	status: {
 		type: String,
 		enum: ["active", "won", "lost"],

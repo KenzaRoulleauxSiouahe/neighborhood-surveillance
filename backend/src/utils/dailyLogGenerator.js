@@ -3,7 +3,7 @@ const MurderSpot = require("../models/MurderSpot");
 const Camera = require("../models/Camera");
 const Location = require("../models/Location");
 
-async function generateDailyLogs(residents, gameDate) {
+async function generateDailyLogs(residents, gameDate, investigationDay) {
 	const murderSpots = await MurderSpot.find();
 
 	const cameras = await Camera.find();
@@ -58,6 +58,7 @@ async function generateDailyLogs(residents, gameDate) {
 				location: actualLocation,
 				suspicious: action.suspicious || false,
 				suspicionLevel: action.suspicionLevel || 0,
+				investigationDay: investigationDay,
 			});
 		}
 	}

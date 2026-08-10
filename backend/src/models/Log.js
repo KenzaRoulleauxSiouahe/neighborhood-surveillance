@@ -45,6 +45,11 @@ const logSchema = new mongoose.Schema({
 		type: Number,
 		default: 0,
 	},
+
+	investigationDay: {
+		type: Number,
+		required: true,
+	},
 });
 
 module.exports = mongoose.model("Log", logSchema);

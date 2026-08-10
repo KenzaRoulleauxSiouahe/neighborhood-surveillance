@@ -20,12 +20,8 @@ router.post("/generate", async (req, res) => {
 			});
 		}
 
-		const logs = await generateDailyLogs(residents, game.currentDate);
-
-		await Log.deleteMany();
-
+		const logs = await generateDailyLogs(residents, game.currentDate, game.investigationDay);
 		await Log.insertMany(logs);
-
 		res.json(logs);
 	} catch (error) {
 		res.status(500).json({

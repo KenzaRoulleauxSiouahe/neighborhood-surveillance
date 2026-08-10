@@ -56,6 +56,7 @@ router.post("/start", async (req, res) => {
 			startDate,
 			currentDate,
 			deadlineDate,
+			investigationDay: 1,
 			status: "active",
 		});
 

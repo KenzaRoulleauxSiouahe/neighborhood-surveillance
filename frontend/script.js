@@ -8,6 +8,9 @@ let residentsData = [];
 let investigationRunning = false;
 let investigationTimer = null;
 let investigationStartTime = null;
+let gameClockInterval = null;
+let gameTimeMinutes = 0;
+let gameStartRealTime = null;
 
 const API_URL = "http://localhost:5000/api";
 const cameraColors = {
@@ -28,6 +31,7 @@ const residentFileOverlay = document.getElementById("resident-file-overlay");
 const closeResidentFileButton = document.getElementById("close-resident-file");
 const residentTabs = document.getElementById("resident-tabs");
 const startInvestigationButton = document.getElementById("start-investigation-btn");
+const GAME_MINUTES_PER_REAL_SECOND = 10;
 
 async function loadBriefingVictims() {
 	try {
@@ -360,7 +364,7 @@ zones.forEach((zone) => {
 		selectedCamera.coveredZones = [zoneName];
 
 		await updateCameraCoverage(selectedCamera._id, selectedCamera.coveredZones);
-		
+
 		updateStartInvestigationButton();
 		console.log(selectedCamera.name, "is placed at", zoneName);
 	});
@@ -499,6 +503,7 @@ startInvestigationButton.addEventListener("click", async () => {
 	startInvestigationButton.disabled = true;
 
 	console.log("Investigation started.");
+	startGameClock();
 
 	try {
 		const response = await fetch(`${API_URL}/actions/generate`, {
@@ -558,3 +563,35 @@ startInvestigationButton.addEventListener("click", async () => {
 		startInvestigationButton.disabled = false;
 	}
 });
+
+function startGameClock() {
+	if (gameClockInterval) {
+		clearInterval(gameClockInterval);
+	}
+	gameStartRealTime = Date.now();
+	updateGameClock();
+	gameClockInterval = setInterval(() => {
+		updateGameClock();
+	}, 50);
+}
+function stopGameClock() {
+	if (gameClockInterval) {
+		clearInterval(gameClockInterval);
+		gameClockInterval = null;
+	}
+}
+function updateGameClock() {
+	if (!gameStartRealTime) {
+		return;
+	}
+	const realElapsedSeconds = (Date.now() - gameStartRealTime) / 1000;
+	const totalGameMinutes = realElapsedSeconds * GAME_MINUTES_PER_REAL_SECOND;
+	const hours = Math.floor(totalGameMinutes / 60);
+	const minutes = Math.floor(totalGameMinutes % 60);
+	const seconds = Math.floor((totalGameMinutes % 1) * 60);
+	const formattedTime = `${String(hours).padStart(2, "0")}:` + `${String(minutes).padStart(2, "0")}:` + `${String(seconds).padStart(2, "0")}`;
+	document.getElementById("game-time").textContent = formattedTime;
+	if (totalGameMinutes >= 24 * 60) {
+		stopGameClock();
+	}
+}

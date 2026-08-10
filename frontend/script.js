@@ -5,6 +5,9 @@ let locationsData = [];
 let cameraCoverage = {};
 let zoneCameras = {};
 let residentsData = [];
+let investigationRunning = false;
+let investigationTimer = null;
+let investigationStartTime = null;
 
 const API_URL = "http://localhost:5000/api";
 const cameraColors = {
@@ -24,6 +27,7 @@ const residentFilesButton = document.getElementById("resident-files-btn");
 const residentFileOverlay = document.getElementById("resident-file-overlay");
 const closeResidentFileButton = document.getElementById("close-resident-file");
 const residentTabs = document.getElementById("resident-tabs");
+const startInvestigationButton = document.getElementById("start-investigation-btn");
 
 async function loadBriefingVictims() {
 	try {
@@ -95,6 +99,7 @@ async function loadCameras() {
 		});
 
 		console.log("Loaded cameras:", camerasData);
+		updateStartInvestigationButton();
 	} catch (error) {
 		console.error("Error loading cameras:", error);
 	}
@@ -355,10 +360,17 @@ zones.forEach((zone) => {
 		selectedCamera.coveredZones = [zoneName];
 
 		await updateCameraCoverage(selectedCamera._id, selectedCamera.coveredZones);
-
+		
+		updateStartInvestigationButton();
 		console.log(selectedCamera.name, "is placed at", zoneName);
 	});
 });
+
+function updateStartInvestigationButton() {
+	const allCamerasPlaced = camerasData.every((camera) => camera.coveredZones && camera.coveredZones.length > 0);
+
+	startInvestigationButton.disabled = !allCamerasPlaced;
+}
 
 residentFilesButton.addEventListener("click", async () => {
 	residentFileOverlay.style.display = "flex";
@@ -440,3 +452,109 @@ function getResidentLocation(houseName) {
 
 	return `${location.name} — ${location.zone}`;
 }
+
+function displayInvestigationLog(log) {
+	const logsContainer = document.getElementById("logs");
+
+	if (!logsContainer) {
+		return;
+	}
+
+	const logEntry = document.createElement("div");
+
+	logEntry.classList.add("log-entry");
+
+	const cameraSpan = document.createElement("span");
+
+	cameraSpan.classList.add("camera-log-name", `camera-log-${cameraColors[log.camera]}`);
+
+	cameraSpan.textContent = log.camera;
+
+	logEntry.appendChild(document.createTextNode(`[${log.time}] `));
+
+	logEntry.appendChild(cameraSpan);
+
+	logEntry.appendChild(document.createTextNode(` | ${log.resident} | ${log.action} | ${log.location}`));
+
+	if (log.suspicious) {
+		logEntry.classList.add("suspicious-log");
+	}
+
+	logsContainer.appendChild(logEntry);
+
+	logsContainer.scrollTop = logsContainer.scrollHeight;
+}
+
+startInvestigationButton.addEventListener("click", async () => {
+	if (investigationRunning) {
+		return;
+	}
+
+	const logsContainer = document.getElementById("logs");
+
+	logsContainer.innerHTML = "";
+
+	investigationRunning = true;
+
+	startInvestigationButton.disabled = true;
+
+	console.log("Investigation started.");
+
+	try {
+		const response = await fetch(`${API_URL}/actions/generate`, {
+			method: "POST",
+		});
+
+		if (!response.ok) {
+			throw new Error("Failed to generate investigation logs.");
+		}
+
+		const logs = await response.json();
+
+		console.log("Day 1 logs:", logs);
+
+		const visibleLogs = logs.filter((log) => log.camera !== null);
+
+		console.log("Visible camera logs:", visibleLogs);
+
+		investigationStartTime = Date.now();
+
+		const gameMinutesPerSecond = 10;
+
+		let displayedLogIndex = 0;
+
+		investigationTimer = setInterval(() => {
+			const elapsedSeconds = (Date.now() - investigationStartTime) / 1000;
+
+			const elapsedGameMinutes = elapsedSeconds * gameMinutesPerSecond;
+
+			const hours = Math.floor(elapsedGameMinutes / 60);
+			const minutes = Math.floor(elapsedGameMinutes % 60);
+
+			const currentGameMinutes = hours * 60 + minutes;
+			while (displayedLogIndex < visibleLogs.length) {
+				const log = visibleLogs[displayedLogIndex];
+				const [logHours, logMinutes] = log.time.split(":").map(Number);
+				const logGameMinutes = logHours * 60 + logMinutes;
+				if (logGameMinutes > currentGameMinutes) {
+					break;
+				}
+				displayInvestigationLog(log);
+				displayedLogIndex++;
+			}
+			console.log(`Investigation time: ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`);
+			if (elapsedGameMinutes >= 24 * 60) {
+				clearInterval(investigationTimer);
+				investigationRunning = false;
+				console.log("Investigation day finished.");
+				startInvestigationButton.disabled = true;
+			}
+		}, 1000);
+	} catch (error) {
+		console.error("Error starting investigation:", error);
+
+		investigationRunning = false;
+
+		startInvestigationButton.disabled = false;
+	}
+});

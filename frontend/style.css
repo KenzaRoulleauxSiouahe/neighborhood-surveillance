@@ -399,7 +399,7 @@ button:active {
 
 #camera-logs {
 	width: 250px;
-	height: 600px;
+	height: 530px;
 	border: 3px solid #800020;
 	padding: 15px;
 	background-color: transparent;
@@ -414,12 +414,88 @@ button:active {
 	letter-spacing: 1px;
 }
 
+.camera-log-name {
+	font-weight: bold;
+	padding: 2px 5px;
+	border-radius: 3px;
+}
+
+.camera-log-green {
+	color: #168a2f;
+	background-color: rgba(80, 170, 90, 0.25);
+}
+
+.camera-log-blue {
+	color: #245bb5;
+	background-color: rgba(80, 120, 210, 0.25);
+}
+
+.camera-log-yellow {
+	color: #8a7200;
+	background-color: rgba(220, 190, 60, 0.35);
+}
+
+.camera-log-red {
+	color: #a51f2f;
+	background-color: rgba(190, 60, 70, 0.25);
+}
 #logs {
+	height: 520px;
+	overflow-y: auto;
+	overflow-x: hidden;
 	color: #665e58;
 	font-size: 14px;
 	line-height: 1.6;
+	padding-right: 8px;
+	scroll-behavior: smooth;
+}
+.log-entry {
+	margin-bottom: 6px;
+}
+#camera-panel {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	width: 280px;
 }
 
+#start-investigation-btn {
+	width: 250px;
+
+	margin-bottom: 20px;
+
+	padding: 14px;
+
+	background-color: #f2eee9;
+
+	color: #292522;
+
+	border: 3px solid #800020;
+
+	font-size: 14px;
+
+	letter-spacing: 1px;
+
+	cursor: pointer;
+
+	transition: 0.2s ease;
+}
+
+#start-investigation-btn:hover:not(:disabled) {
+	background-color: #800020;
+
+	color: white;
+}
+
+#start-investigation-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+.suspicious-log {
+	color: #800020;
+	font-weight: bold;
+}
 #legend {
 	padding: 10px;
 
@@ -583,7 +659,7 @@ button:active {
 
 	border-right: 2px solid #8d7c6d;
 
-	overflow-y:auto;
+	overflow-y: auto;
 	overflow-x: hidden;
 }
 

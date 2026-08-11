@@ -31,7 +31,8 @@ const residentFileOverlay = document.getElementById("resident-file-overlay");
 const closeResidentFileButton = document.getElementById("close-resident-file");
 const residentTabs = document.getElementById("resident-tabs");
 const startInvestigationButton = document.getElementById("start-investigation-btn");
-const GAME_MINUTES_PER_REAL_SECOND = 10;
+const nextDayButton = document.getElementById("next-day-btn");
+const GAME_MINUTES_PER_REAL_SECOND = 24;
 
 async function loadBriefingVictims() {
 	try {
@@ -533,7 +534,6 @@ startInvestigationButton.addEventListener("click", async () => {
 	startInvestigationButton.disabled = true;
 
 	console.log("Investigation started.");
-	
 
 	try {
 		const response = await fetch(`${API_URL}/actions/generate`, {
@@ -564,14 +564,14 @@ startInvestigationButton.addEventListener("click", async () => {
 
 		investigationStartTime = Date.now();
 
-		const gameMinutesPerSecond = 10;
+		const gameMinutesPerSecond = GAME_MINUTES_PER_REAL_SECOND;
 
 		let displayedLogIndex = 0;
 
 		investigationTimer = setInterval(() => {
 			const elapsedSeconds = (Date.now() - investigationStartTime) / 1000;
 
-			const elapsedGameMinutes = elapsedSeconds * gameMinutesPerSecond;
+			const elapsedGameMinutes = GAME_MINUTES_PER_REAL_SECOND;
 
 			const hours = Math.floor(elapsedGameMinutes / 60);
 
@@ -605,6 +605,8 @@ startInvestigationButton.addEventListener("click", async () => {
 				console.log("Investigation day finished.");
 
 				startInvestigationButton.disabled = true;
+
+				nextDayButton.disabled = false;
 			}
 		}, 1000);
 	} catch (error) {
@@ -613,6 +615,57 @@ startInvestigationButton.addEventListener("click", async () => {
 		investigationRunning = false;
 
 		startInvestigationButton.disabled = false;
+	}
+});
+
+nextDayButton.addEventListener("click", async () => {
+	if (investigationRunning) {
+		return;
+	}
+
+	try {
+		nextDayButton.disabled = true;
+
+		const response = await fetch(`${API_URL}/actions/next-day`, {
+			method: "POST",
+		});
+
+		if (!response.ok) {
+			throw new Error("Failed to start next investigation day.");
+		}
+
+		const data = await response.json();
+
+		console.log("Next investigation day:", data);
+
+		const logsContainer = document.getElementById("logs");
+
+		if (logsContainer) {
+			logsContainer.innerHTML = "<p>No activity yet...</p>";
+		}
+
+		const dayElement = document.getElementById("investigation-day");
+
+		if (dayElement) {
+			dayElement.textContent = `INVESTIGATION DAY ${data.game.investigationDay}`;
+		}
+
+		const gameTime = document.getElementById("game-time");
+
+		if (gameTime) {
+			gameTime.textContent = "00:00:00";
+		}
+
+		investigationRunning = false;
+		investigationStartTime = null;
+
+		startInvestigationButton.disabled = false;
+
+		console.log(`Investigation Day ${data.game.investigationDay} ready.`);
+	} catch (error) {
+		console.error("Error starting next investigation day:", error);
+
+		nextDayButton.disabled = false;
 	}
 });
 
@@ -716,14 +769,14 @@ function startInvestigationLogPlayback(visibleLogs, investigationStartedAt) {
 
 	logsContainer.innerHTML = "";
 
-	const gameStartTime = new Date(investigationStartedAt).getTime();
+	const gameStartTime = gameStartRealTime;
 
 	let displayedLogIndex = 0;
 
 	function checkLogs() {
 		const elapsedRealSeconds = (Date.now() - gameStartTime) / 1000;
 
-		const elapsedGameMinutes = elapsedRealSeconds * 10;
+		const elapsedGameMinutes = elapsedRealSeconds * GAME_MINUTES_PER_REAL_SECOND;
 
 		const currentGameMinutes = Math.floor(elapsedGameMinutes);
 

@@ -33,6 +33,43 @@ router.post("/generate", async (req, res) => {
 		res.status(500).json({ error: error.message });
 	}
 });
+
+router.post("/next-day", async (req, res) => {
+	try {
+		const game = await Game.findOne({
+			status: "active",
+		});
+
+		if (!game) {
+			return res.status(400).json({
+				error: "No active game found.",
+			});
+		}
+
+		game.investigationDay += 1;
+
+		const nextDate = new Date(game.currentDate);
+		nextDate.setDate(nextDate.getDate() + 1);
+
+		game.currentDate = nextDate;
+		game.investigationRunning = false;
+		game.investigationStartedAt = null;
+
+		await game.save();
+
+		res.json({
+			message: `Investigation Day ${game.investigationDay} started.`,
+			game,
+			logs,
+		});
+	} catch (error) {
+		console.error("Error starting next investigation day:", error);
+
+		res.status(500).json({
+			error: error.message,
+		});
+	}
+});
 router.get("/logs", async (req, res) => {
 	try {
 		const game = await Game.findOne({

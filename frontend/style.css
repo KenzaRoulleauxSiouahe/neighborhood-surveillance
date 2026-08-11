@@ -405,6 +405,7 @@ button:active {
 	background-color: transparent;
 	text-align: left;
 	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+	overflow: hidden;
 }
 
 #camera-logs h3 {
@@ -440,7 +441,7 @@ button:active {
 	background-color: rgba(190, 60, 70, 0.25);
 }
 #logs {
-	height: 520px;
+	height: 510px;
 	overflow-y: auto;
 	overflow-x: hidden;
 	color: #665e58;
@@ -448,6 +449,7 @@ button:active {
 	line-height: 1.6;
 	padding-right: 8px;
 	scroll-behavior: smooth;
+	word-wrap: break-word;
 }
 .log-entry {
 	margin-bottom: 6px;
@@ -463,6 +465,7 @@ button:active {
 #game-clock {
 	width: 250px;
 
+	margin-top: 15px;
 	margin-bottom: 15px;
 	padding: 12px;
 
@@ -643,6 +646,65 @@ button:active {
 	background: #800020 !important;
 	color: white !important;
 	border-color: #800020 !important;
+}
+
+#next-day-btn {
+	width: 180px;
+
+	padding: 12px 20px;
+
+	background-color: #292522;
+
+	color: #f2eee9;
+
+	border: 3px solid #800020;
+
+	font-family: Arial, sans-serif;
+
+	font-size: 13px;
+
+	font-weight: bold;
+
+	letter-spacing: 1.5px;
+
+	cursor: pointer;
+
+	transition:
+		background-color 0.2s ease,
+		color 0.2s ease,
+		border-color 0.2s ease,
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+#next-day-btn:hover:not(:disabled) {
+	background-color: #800020;
+
+	color: white;
+
+	border-color: #800020;
+
+	box-shadow: 0 0 10px rgba(128, 0, 32, 0.35);
+
+	transform: translateY(-2px);
+}
+
+#next-day-btn:active:not(:disabled) {
+	transform: translateY(0);
+
+	box-shadow: none;
+}
+
+#next-day-btn:disabled {
+	background-color: #d1cbc4;
+
+	color: #8a8179;
+
+	border-color: #b5aca3;
+
+	cursor: not-allowed;
+
+	opacity: 0.7;
 }
 
 .file-header {

@@ -3,7 +3,6 @@ const router = express.Router();
 const Resident = require("../models/Resident");
 const roleRoutines = require("../utils/routineGenerator");
 
-// GET all residents
 router.get("/", async (req, res) => {
 	try {
 		const residents = await Resident.find().select("-isCultMember");

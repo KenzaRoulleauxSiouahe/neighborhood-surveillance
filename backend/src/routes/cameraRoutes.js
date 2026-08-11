@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Camera = require("../models/Camera");
 
-// GET all cameras
 router.get("/", async (req, res) => {
 	try {
 		const cameras = await Camera.find();
@@ -12,7 +11,6 @@ router.get("/", async (req, res) => {
 	}
 });
 
-//RESET camera locations
 router.patch("/reset", async (req, res) => {
 	try {
 		await Camera.updateMany(

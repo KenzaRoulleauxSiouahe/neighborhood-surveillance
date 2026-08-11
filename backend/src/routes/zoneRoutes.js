@@ -3,7 +3,6 @@ const router = express.Router();
 
 const Zone = require("../models/Zone");
 
-// GET all zones
 router.get("/", async (req, res) => {
 	try {
 		const zones = await Zone.find();

@@ -98,5 +98,21 @@ router.get("/active", async (req, res) => {
 		});
 	}
 });
+router.patch("/finish-investigation", async (req, res) => {
+	try {
+		const game = await Game.findOne({ status: "active" });
+		if (!game) {
+			return res.status(400).json({ error: "No active game found." });
+		}
+		game.investigationRunning = false;
+		game.investigationStartedAt = null;
+		await game.save();
+		console.log(`Investigation Day ${game.investigationDay} finished.`);
+		res.json({ message: "Investigation finished.", game });
+	} catch (error) {
+		console.error("Error finishing investigation:", error);
+		res.status(500).json({ error: error.message });
+	}
+});
 
 module.exports = router;

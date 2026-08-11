@@ -1,6 +1,5 @@
 let camerasData = [];
 let selectedCamera = null;
-let cameraPositions = {};
 let locationsData = [];
 let cameraCoverage = {};
 let zoneCameras = {};
@@ -9,7 +8,6 @@ let investigationRunning = false;
 let investigationTimer = null;
 let investigationStartTime = null;
 let gameClockInterval = null;
-let gameTimeMinutes = 0;
 let gameStartRealTime = null;
 
 const API_URL = "http://localhost:5000/api";
@@ -29,6 +27,11 @@ const zones = document.querySelectorAll(".zone");
 const residentFilesButton = document.getElementById("resident-files-btn");
 const residentFileOverlay = document.getElementById("resident-file-overlay");
 const closeResidentFileButton = document.getElementById("close-resident-file");
+const logArchiveButton = document.getElementById("log-archive-btn");
+const logArchiveOverlay = document.getElementById("log-archive-overlay");
+const closeLogArchiveButton = document.getElementById("close-log-archive");
+const logArchiveDays = document.getElementById("log-archive-days");
+const archivedLogs = document.getElementById("archived-logs");
 const residentTabs = document.getElementById("resident-tabs");
 const startInvestigationButton = document.getElementById("start-investigation-btn");
 const nextDayButton = document.getElementById("next-day-btn");
@@ -193,6 +196,11 @@ async function newGame() {
 		}
 
 		startInvestigationButton.disabled = true;
+		const dayElement = document.getElementById("investigation-day");
+
+		if (dayElement) {
+			dayElement.textContent = "INVESTIGATION DAY 1";
+		}
 
 		await fetch(`${API_URL}/game/start`, {
 			method: "POST",
@@ -341,6 +349,10 @@ newGameButton.addEventListener("click", () => {
 
 zones.forEach((zone) => {
 	zone.addEventListener("click", async () => {
+		if (investigationRunning) {
+			console.log("You cannot move cameras during an investigation.");
+			return;
+		}
 		if (selectedCamera === null) {
 			console.log("Please select a camera first.");
 			return;
@@ -386,7 +398,6 @@ zones.forEach((zone) => {
 			delete zoneCameras[oldZone];
 		}
 
-		// Add color immediately
 		zone.classList.add(`camera-${selectedCamera.color}`);
 
 		cameraCoverage[selectedCamera.name] = zoneName;
@@ -396,43 +407,17 @@ zones.forEach((zone) => {
 
 		await updateCameraCoverage(selectedCamera._id, selectedCamera.coveredZones);
 
-		updateStartInvestigationButton();
 		console.log(selectedCamera.name, "is placed at", zoneName);
 	});
 });
 
 function updateStartInvestigationButton() {
-	const allCamerasPlaced = camerasData.every((camera) => camera.coveredZones && camera.coveredZones.length > 0);
-
-	startInvestigationButton.disabled = !allCamerasPlaced;
-}
-
-residentFilesButton.addEventListener("click", async () => {
-	residentFileOverlay.style.display = "flex";
-
-	await loadResidents();
-});
-
-closeResidentFileButton.addEventListener("click", () => {
-	residentFileOverlay.style.display = "none";
-});
-
-async function loadResidents() {
-	try {
-		const response = await fetch(`${API_URL}/residents`);
-
-		residentsData = await response.json();
-
-		console.log("Loaded residents:", residentsData);
-
-		displayResidentTabs();
-
-		if (residentsData.length > 0) {
-			displayResident(residentsData[0]);
-		}
-	} catch (error) {
-		console.error("Error loading residents:", error);
+	if (investigationRunning) {
+		startInvestigationButton.disabled = true;
+		return;
 	}
+
+	startInvestigationButton.disabled = false;
 }
 
 function displayResidentTabs() {
@@ -488,6 +473,85 @@ function getResidentLocation(houseName) {
 	return `${location.name} — ${location.zone}`;
 }
 
+logArchiveButton.addEventListener("click", async () => {
+	logArchiveOverlay.style.display = "flex";
+
+	await loadLogArchive();
+});
+
+closeLogArchiveButton.addEventListener("click", () => {
+	logArchiveOverlay.style.display = "none";
+});
+
+async function loadLogArchive() {
+	try {
+		const response = await fetch(`${API_URL}/actions/archive`);
+
+		if (!response.ok) {
+			throw new Error("Failed to load log archive.");
+		}
+
+		const logs = await response.json();
+
+		console.log("Archived logs:", logs);
+
+		const days = [...new Set(logs.map((log) => log.investigationDay))].sort((a, b) => a - b);
+
+		logArchiveDays.innerHTML = "";
+
+		days.forEach((day) => {
+			const button = document.createElement("button");
+
+			button.textContent = `INVESTIGATION DAY ${day}`;
+
+			button.addEventListener("click", () => {
+				displayArchivedLogs(logs, day);
+			});
+
+			logArchiveDays.appendChild(button);
+		});
+	} catch (error) {
+		console.error("Error loading log archive:", error);
+	}
+}
+
+function displayArchivedLogs(logs, day) {
+	archivedLogs.innerHTML = "";
+
+	const dayLogs = logs
+		.filter((log) => log.investigationDay === day)
+		.filter((log) => log.camera !== null)
+		.sort((a, b) => a.time.localeCompare(b.time));
+
+	if (dayLogs.length === 0) {
+		archivedLogs.innerHTML = "<p>No camera logs recorded for this day.</p>";
+		return;
+	}
+
+	dayLogs.forEach((log) => {
+		const logEntry = document.createElement("div");
+
+		logEntry.classList.add("log-entry");
+
+		const cameraSpan = document.createElement("span");
+
+		cameraSpan.classList.add("camera-log-name", `camera-log-${cameraColors[log.camera]}`);
+
+		cameraSpan.textContent = log.camera;
+
+		logEntry.appendChild(document.createTextNode(`[${log.time}] `));
+
+		logEntry.appendChild(cameraSpan);
+
+		logEntry.appendChild(document.createTextNode(` | ${log.resident} | ${log.action} | ${log.location}`));
+
+		if (log.suspicious) {
+			logEntry.classList.add("suspicious-log");
+		}
+
+		archivedLogs.appendChild(logEntry);
+	});
+}
 function displayInvestigationLog(log) {
 	const logsContainer = document.getElementById("logs");
 
@@ -525,6 +589,23 @@ startInvestigationButton.addEventListener("click", async () => {
 		return;
 	}
 
+	const gameResponse = await fetch(`${API_URL}/game/active`);
+
+	if (!gameResponse.ok) {
+		console.error("Could not find active game.");
+		return;
+	}
+
+	const game = await gameResponse.json();
+
+	const changeCameras = confirm(`INVESTIGATION DAY ${game.investigationDay}\n\nDo you want to change the camera positions before starting the investigation?`);
+
+	if (changeCameras) {
+		alert("Change the camera positions on the map, then click START INVESTIGATION again.");
+
+		return;
+	}
+
 	const logsContainer = document.getElementById("logs");
 
 	logsContainer.innerHTML = "";
@@ -546,32 +627,36 @@ startInvestigationButton.addEventListener("click", async () => {
 
 		const logs = await response.json();
 
-		console.log("Day 1 logs:", logs);
+		console.log(`Day ${game.investigationDay} logs:`, logs);
 
 		const visibleLogs = logs.filter((log) => log.camera !== null);
 
 		console.log("Visible camera logs:", visibleLogs);
 
-		const gameResponse = await fetch(`${API_URL}/game/active`);
+		const updatedGameResponse = await fetch(`${API_URL}/game/active`);
 
-		if (!gameResponse.ok) {
+		if (!updatedGameResponse.ok) {
 			throw new Error("Could not find active game.");
 		}
 
-		const game = await gameResponse.json();
+		const updatedGame = await updatedGameResponse.json();
 
-		startGameClock(game.investigationStartedAt);
+		const dayElement = document.getElementById("investigation-day");
 
-		investigationStartTime = Date.now();
+		if (dayElement) {
+			dayElement.textContent = `INVESTIGATION DAY ${updatedGame.investigationDay}`;
+		}
 
-		const gameMinutesPerSecond = GAME_MINUTES_PER_REAL_SECOND;
+		startGameClock(updatedGame.investigationStartedAt);
+
+		investigationStartTime = new Date(updatedGame.investigationStartedAt).getTime();
 
 		let displayedLogIndex = 0;
 
-		investigationTimer = setInterval(() => {
+		investigationTimer = setInterval(async () => {
 			const elapsedSeconds = (Date.now() - investigationStartTime) / 1000;
 
-			const elapsedGameMinutes = GAME_MINUTES_PER_REAL_SECOND;
+			const elapsedGameMinutes = elapsedSeconds * GAME_MINUTES_PER_REAL_SECOND;
 
 			const hours = Math.floor(elapsedGameMinutes / 60);
 
@@ -600,12 +685,27 @@ startInvestigationButton.addEventListener("click", async () => {
 			if (elapsedGameMinutes >= 24 * 60) {
 				clearInterval(investigationTimer);
 
+				investigationTimer = null;
+
+				stopGameClock();
+
 				investigationRunning = false;
 
 				console.log("Investigation day finished.");
 
-				startInvestigationButton.disabled = true;
+				try {
+					const finishResponse = await fetch(`${API_URL}/game/finish-investigation`, {
+						method: "PATCH",
+					});
 
+					if (!finishResponse.ok) {
+						console.error("Could not update investigation status on server.");
+					}
+				} catch (error) {
+					console.error("Error finishing investigation on server:", error);
+				}
+				startInvestigationButton.disabled = true;
+				
 				nextDayButton.disabled = false;
 			}
 		}, 1000);
@@ -624,30 +724,31 @@ nextDayButton.addEventListener("click", async () => {
 	}
 
 	try {
-		nextDayButton.disabled = true;
-
 		const response = await fetch(`${API_URL}/actions/next-day`, {
 			method: "POST",
 		});
 
+		const responseText = await response.text();
+
+		console.log("NEXT DAY status:", response.status);
+		console.log("NEXT DAY response:", responseText);
+
 		if (!response.ok) {
-			throw new Error("Failed to start next investigation day.");
+			throw new Error(`Failed to start next investigation day. Status: ${response.status}`);
 		}
 
-		const data = await response.json();
+		const data = JSON.parse(responseText);
 
 		console.log("Next investigation day:", data);
-
-		const logsContainer = document.getElementById("logs");
-
-		if (logsContainer) {
-			logsContainer.innerHTML = "<p>No activity yet...</p>";
-		}
-
 		const dayElement = document.getElementById("investigation-day");
 
 		if (dayElement) {
 			dayElement.textContent = `INVESTIGATION DAY ${data.game.investigationDay}`;
+		}
+		const logsContainer = document.getElementById("logs");
+
+		if (logsContainer) {
+			logsContainer.innerHTML = "<p>No activity yet...</p>";
 		}
 
 		const gameTime = document.getElementById("game-time");
@@ -659,13 +760,19 @@ nextDayButton.addEventListener("click", async () => {
 		investigationRunning = false;
 		investigationStartTime = null;
 
+		if (investigationTimer) {
+			clearInterval(investigationTimer);
+			investigationTimer = null;
+		}
+
+		stopGameClock();
+		nextDayButton.disabled = true;
+
 		startInvestigationButton.disabled = false;
 
 		console.log(`Investigation Day ${data.game.investigationDay} ready.`);
 	} catch (error) {
 		console.error("Error starting next investigation day:", error);
-
-		nextDayButton.disabled = false;
 	}
 });
 
@@ -695,7 +802,7 @@ function updateGameClock() {
 
 	const realElapsedSeconds = (Date.now() - gameStartRealTime) / 1000;
 
-	const totalGameMinutes = realElapsedSeconds * 10;
+	const totalGameMinutes = realElapsedSeconds * GAME_MINUTES_PER_REAL_SECOND;
 
 	if (totalGameMinutes >= 24 * 60) {
 		stopGameClock();

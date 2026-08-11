@@ -8,8 +8,6 @@ const generateDailyLogs = require("../utils/dailyLogGenerator");
 
 router.post("/generate", async (req, res) => {
 	try {
-		const residents = await Resident.find();
-
 		const game = await Game.findOne({
 			status: "active",
 		});
@@ -20,17 +18,32 @@ router.post("/generate", async (req, res) => {
 			});
 		}
 
-		const logs = await generateDailyLogs(residents, game.currentDate, game.investigationDay);
-		await Log.insertMany(logs);
+		let logs = await Log.find({
+			investigationDay: game.investigationDay,
+		}).sort({
+			time: 1,
+		});
 
-		if (!game.investigationRunning) {
-			game.investigationStartedAt = new Date();
-			game.investigationRunning = true;
-			await game.save();
+		if (logs.length === 0) {
+			const residents = await Resident.find();
+
+			logs = await generateDailyLogs(residents, game.currentDate, game.investigationDay);
+
+			await Log.insertMany(logs);
 		}
+
+		game.investigationRunning = true;
+		game.investigationStartedAt = new Date();
+
+		await game.save();
+
 		res.json(logs);
 	} catch (error) {
-		res.status(500).json({ error: error.message });
+		console.error("Error generating investigation logs:", error);
+
+		res.status(500).json({
+			error: error.message,
+		});
 	}
 });
 
@@ -45,6 +58,11 @@ router.post("/next-day", async (req, res) => {
 				error: "No active game found.",
 			});
 		}
+		if (game.investigationRunning) {
+			return res.status(400).json({
+				error: "The current investigation is still running.",
+			});
+		}
 
 		game.investigationDay += 1;
 
@@ -56,6 +74,12 @@ router.post("/next-day", async (req, res) => {
 		game.investigationStartedAt = null;
 
 		await game.save();
+
+		const residents = await Resident.find();
+
+		const logs = await generateDailyLogs(residents, game.currentDate, game.investigationDay);
+
+		await Log.insertMany(logs);
 
 		res.json({
 			message: `Investigation Day ${game.investigationDay} started.`,
@@ -96,4 +120,34 @@ router.get("/logs", async (req, res) => {
 	}
 });
 
+router.get("/archive", async (req, res) => {
+	try {
+		const game = await Game.findOne({
+			status: "active",
+		});
+
+		if (!game) {
+			return res.status(400).json({
+				error: "No active game found.",
+			});
+		}
+
+		const logs = await Log.find({
+			investigationDay: {
+				$lt: game.investigationDay,
+			},
+		}).sort({
+			investigationDay: 1,
+			time: 1,
+		});
+
+		res.json(logs);
+	} catch (error) {
+		console.error("Error loading log archive:", error);
+
+		res.status(500).json({
+			error: error.message,
+		});
+	}
+});
 module.exports = router;

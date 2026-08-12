@@ -975,16 +975,48 @@ async function resumeInvestigation() {
 
 		console.log("Active game:", game);
 
+		const dayElement = document.getElementById("investigation-day");
+
+		if (dayElement) {
+			dayElement.textContent = `INVESTIGATION DAY ${game.investigationDay}`;
+		}
+		if (game.investigationDay >= 4 && !game.investigationRunning) {
+			console.log("Day 4 has already been completed.");
+
+			investigationRunning = false;
+
+			const gameTime = document.getElementById("game-time");
+
+			if (gameTime) {
+				gameTime.textContent = "24:00:00";
+			}
+
+			if (investigationTimer) {
+				clearInterval(investigationTimer);
+				investigationTimer = null;
+			}
+
+			stopGameClock();
+
+			startInvestigationButton.disabled = true;
+			nextDayButton.disabled = true;
+
+			accusationButton.style.display = "block";
+
+			console.log("Final accusation is available.");
+
+			return;
+		}
+
 		if (game.investigationRunning && game.investigationStartedAt) {
 			console.log("Resuming investigation clock...");
 
+			investigationRunning = true;
+
 			startGameClock(game.investigationStartedAt);
 
-			const dayElement = document.getElementById("investigation-day");
-
-			if (dayElement) {
-				dayElement.textContent = `INVESTIGATION DAY ${game.investigationDay}`;
-			}
+			startInvestigationButton.disabled = true;
+			nextDayButton.disabled = true;
 
 			const logsResponse = await fetch(`${API_URL}/actions/logs`);
 
@@ -1000,7 +1032,17 @@ async function resumeInvestigation() {
 			console.log("Visible saved logs:", visibleLogs);
 
 			startInvestigationLogPlayback(visibleLogs, game.investigationStartedAt);
+
+			return;
 		}
+
+		investigationRunning = false;
+
+		startInvestigationButton.disabled = false;
+
+		nextDayButton.disabled = true;
+
+		console.log(`Investigation Day ${game.investigationDay} is ready.`);
 	} catch (error) {
 		console.error("Error resuming investigation:", error);
 	}

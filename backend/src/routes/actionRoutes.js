@@ -139,7 +139,7 @@ router.get("/archive", async (req, res) => {
 
 		const logs = await Log.find({
 			investigationDay: {
-				$lt: game.investigationDay,
+				$lte: game.investigationDay,
 			},
 		}).sort({
 			investigationDay: 1,

@@ -63,6 +63,11 @@ router.post("/next-day", async (req, res) => {
 				error: "The current investigation is still running.",
 			});
 		}
+		if (game.investigationDay >= 4) {
+			return res.status(400).json({
+				error: "The final investigation day has already been completed.",
+			});
+		}
 
 		game.investigationDay += 1;
 

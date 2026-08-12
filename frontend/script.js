@@ -705,8 +705,26 @@ startInvestigationButton.addEventListener("click", async () => {
 					console.error("Error finishing investigation on server:", error);
 				}
 				startInvestigationButton.disabled = true;
-				
-				nextDayButton.disabled = false;
+
+				if (updatedGame.investigationDay >= 4) {
+					nextDayButton.disabled = true;
+
+					const logsContainer = document.getElementById("logs");
+
+					if (logsContainer) {
+						logsContainer.innerHTML += `
+			<p class="final-day-message">
+				THIS WAS THE FINAL INVESTIGATION DAY.
+				<br>
+				Review the resident files and log archive before making your guess.
+			</p>
+		`;
+					}
+
+					console.log("Final investigation day finished.");
+				} else {
+					nextDayButton.disabled = false;
+				}
 			}
 		}, 1000);
 	} catch (error) {

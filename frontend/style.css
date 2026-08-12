@@ -981,3 +981,304 @@ button:active {
 
 	text-align: right;
 }
+
+#accusation-overlay {
+	position: fixed;
+
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	display: none;
+
+	justify-content: center;
+	align-items: center;
+
+	background-color: rgba(0, 0, 0, 0.75);
+
+	z-index: 3000;
+
+	padding: 30px;
+
+	box-sizing: border-box;
+}
+
+#accusation-screen {
+	position: relative;
+
+	width: 900px;
+	max-width: 90%;
+
+	height: 650px;
+	max-height: 90vh;
+
+	background-color: #f2eee9;
+
+	border: 3px solid #800020;
+
+	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+
+	color: #3d3029;
+
+	overflow-y: auto;
+
+	text-align: center;
+
+	box-sizing: border-box;
+}
+
+#close-accusation {
+	position: absolute !important;
+
+	top: 8px !important;
+	right: 8px !important;
+
+	width: 20px !important;
+	height: 20px !important;
+
+	padding: 0 !important;
+
+	background: transparent !important;
+
+	color: #4a3027 !important;
+
+	border: 1px solid #4a3027 !important;
+
+	font-size: 11px !important;
+
+	line-height: 18px !important;
+
+	cursor: pointer !important;
+
+	z-index: 9999 !important;
+}
+
+#close-accusation:hover {
+	background: #800020 !important;
+
+	color: white !important;
+
+	border-color: #800020 !important;
+}
+
+#accusation-screen::before {
+	content: "CONFIDENTIAL";
+
+	display: inline-block;
+
+	margin-top: 30px;
+	margin-bottom: 10px;
+
+	padding: 6px 14px;
+
+	color: #800020;
+
+	border: 2px solid #800020;
+
+	font-size: 11px;
+
+	font-weight: bold;
+
+	letter-spacing: 3px;
+
+	transform: rotate(-3deg);
+
+	opacity: 0.8;
+}
+
+#accusation-screen h1 {
+	margin: 5px 0 10px;
+
+	color: #292522;
+
+	font-size: 32px;
+
+	letter-spacing: 4px;
+}
+
+#accusation-screen .briefing-divider {
+	width: 80px;
+
+	height: 2px;
+
+	background-color: #800020;
+
+	margin: 15px auto 25px;
+}
+
+.accusation-description {
+	max-width: 650px;
+
+	margin: 8px auto;
+
+	color: #665e58;
+
+	font-size: 15px;
+
+	line-height: 1.6;
+}
+
+#accusation-screen h2 {
+	margin-top: 30px;
+
+	color: #3d3029;
+
+	font-size: 20px;
+
+	font-weight: bold;
+
+	letter-spacing: 1px;
+}
+
+.accusation-instruction {
+	margin-bottom: 25px;
+
+	color: #766e67;
+
+	font-size: 13px;
+}
+
+#accusation-residents {
+	display: grid;
+
+	grid-template-columns: repeat(4, 1fr);
+
+	gap: 10px;
+
+	max-width: 750px;
+
+	margin: 25px auto;
+}
+
+.accusation-resident {
+	width: 100%;
+
+	padding: 13px 18px;
+
+	background-color: #f2eee9;
+
+	color: #3d3029;
+
+	border: 2px solid #a99e93;
+
+	text-align: center;
+
+	font-family: Arial, sans-serif;
+
+	font-size: 13px;
+
+	font-weight: bold;
+
+	letter-spacing: 0.3px;
+
+	cursor: pointer;
+
+	transition:
+		background-color 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease,
+		transform 0.2s ease;
+}
+
+.accusation-resident:hover {
+	background-color: #e8e3dc;
+
+	color: #800020;
+
+	border-color: #800020;
+
+	transform: translateY(-2px);
+}
+
+.accusation-resident.selected {
+	background-color: #800020;
+
+	color: white;
+
+	border-color: #800020;
+
+	box-shadow: 0 0 10px rgba(128, 0, 32, 0.25);
+}
+
+.accusation-resident.selected:hover {
+	background-color: #800020;
+
+	color: white;
+}
+
+#submit-accusation-btn {
+	margin-top: 20px;
+
+	padding: 14px 30px;
+
+	background-color: transparent;
+
+	color: #3d3029;
+
+	border: 3px solid #800020;
+
+	font-size: 14px;
+
+	font-weight: bold;
+
+	letter-spacing: 2px;
+
+	cursor: pointer;
+
+	transition: 0.2s ease;
+}
+
+#submit-accusation-btn:hover {
+	background-color: #800020;
+
+	color: white;
+}
+
+#submit-accusation-btn:active {
+	transform: scale(0.96);
+}
+
+#submit-accusation-btn:disabled {
+	opacity: 0.5;
+
+	cursor: not-allowed;
+}
+
+#accusation-result {
+	max-width: 650px;
+
+	margin: 30px auto 0;
+
+	color: #3d3029;
+
+	line-height: 1.6;
+}
+
+.accusation-success,
+.accusation-failure {
+	padding: 25px;
+
+	background-color: #ddd2c4;
+
+	border: 2px solid #8d7c6d;
+}
+
+.accusation-success h2,
+.accusation-failure h2 {
+	margin-top: 0;
+
+	color: #800020;
+
+	font-size: 22px;
+
+	letter-spacing: 2px;
+}
+
+.accusation-success p,
+.accusation-failure p {
+	color: #665e58;
+
+	font-size: 14px;
+}

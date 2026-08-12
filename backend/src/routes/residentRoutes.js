@@ -24,4 +24,36 @@ router.get("/", async (req, res) => {
 	}
 });
 
+router.post("/accuse", async (req, res) => {
+	try {
+		const { accusations } = req.body;
+
+		if (!Array.isArray(accusations)) {
+			return res.status(400).json({
+				error: "Accusations must be an array.",
+			});
+		}
+
+		const cultMembers = await Resident.find({
+			isCultMember: true,
+		});
+
+		const cultMemberNames = cultMembers.map((resident) => resident.name);
+
+		const correct = accusations.length === cultMemberNames.length && accusations.every((name) => cultMemberNames.includes(name));
+
+		res.json({
+			correct: correct,
+			selected: accusations,
+			actualCultMembers: correct ? cultMemberNames : undefined,
+		});
+	} catch (error) {
+		console.error("Error checking accusation:", error);
+
+		res.status(500).json({
+			error: "Could not check accusation.",
+		});
+	}
+});
+
 module.exports = router;

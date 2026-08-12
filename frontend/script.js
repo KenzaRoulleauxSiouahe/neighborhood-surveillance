@@ -9,6 +9,7 @@ let investigationTimer = null;
 let investigationStartTime = null;
 let gameClockInterval = null;
 let gameStartRealTime = null;
+let selectedAccusations = [];
 
 const API_URL = "http://localhost:5000/api";
 const cameraColors = {
@@ -36,6 +37,12 @@ const residentTabs = document.getElementById("resident-tabs");
 const startInvestigationButton = document.getElementById("start-investigation-btn");
 const nextDayButton = document.getElementById("next-day-btn");
 const GAME_MINUTES_PER_REAL_SECOND = 24;
+const accusationButton = document.getElementById("accusation-btn");
+const accusationOverlay = document.getElementById("accusation-overlay");
+const closeAccusationBtn = document.getElementById("close-accusation");
+const accusationResidents = document.getElementById("accusation-residents");
+const submitAccusationButton = document.getElementById("submit-accusation-btn");
+const accusationResult = document.getElementById("accusation-result");
 
 async function loadBriefingVictims() {
 	try {
@@ -708,23 +715,25 @@ startInvestigationButton.addEventListener("click", async () => {
 
 				if (updatedGame.investigationDay >= 4) {
 					nextDayButton.disabled = true;
+					accusationButton.style.display = "block";
 
 					const logsContainer = document.getElementById("logs");
 
 					if (logsContainer) {
 						logsContainer.innerHTML += `
-			<p class="final-day-message">
-				THIS WAS THE FINAL INVESTIGATION DAY.
-				<br>
-				Review the resident files and log archive before making your guess.
-			</p>
-		`;
+            <p class="final-day-message">
+                THIS WAS THE FINAL INVESTIGATION DAY.
+                <br>
+                Review the resident files and log archive before making your guess.
+            </p>
+        `;
 					}
 
 					console.log("Final investigation day finished.");
-				} else {
-					nextDayButton.disabled = false;
 				}
+			} else {
+				nextDayButton.disabled = false;
+				
 			}
 		}, 1000);
 	} catch (error) {
@@ -736,6 +745,118 @@ startInvestigationButton.addEventListener("click", async () => {
 	}
 });
 
+accusationButton.addEventListener("click", async () => {
+	accusationOverlay.style.display = "flex";
+
+	await loadAccusationResidents();
+});
+
+submitAccusationButton.addEventListener("click", async () => {
+	if (selectedAccusations.length === 0) {
+		accusationResult.innerHTML = `
+            <p class="accusation-incorrect">
+                Please select at least one resident.
+            </p>
+        `;
+
+		return;
+	}
+
+	try {
+		const response = await fetch(`${API_URL}/residents/accuse`, {
+			method: "POST",
+
+			headers: {
+				"Content-Type": "application/json",
+			},
+
+			body: JSON.stringify({
+				accusations: selectedAccusations,
+			}),
+		});
+
+		const result = await response.json();
+
+		if (!response.ok) {
+			throw new Error(result.error);
+		}
+
+		if (result.correct) {
+			accusationResult.innerHTML = `
+                <p class="accusation-correct">
+                    ✓ ACCUSATION CORRECT
+                </p>
+
+                <p>
+                    You identified all members of the cult.
+                </p>
+            `;
+		} else {
+			accusationResult.innerHTML = `
+                <p class="accusation-incorrect">
+                    ✕ ACCUSATION INCORRECT
+                </p>
+
+                <p>
+                    Your investigation has not identified
+                    all of the cult members.
+                </p>
+            `;
+		}
+	} catch (error) {
+		console.error("Error submitting accusation:", error);
+
+		accusationResult.innerHTML = `
+            <p class="accusation-incorrect">
+                Something went wrong while submitting
+                the accusation.
+            </p>
+        `;
+	}
+});
+async function loadAccusationResidents() {
+	try {
+		const response = await fetch(`${API_URL}/residents`);
+
+		if (!response.ok) {
+			throw new Error("Failed to load residents.");
+		}
+
+		const residents = await response.json();
+
+		accusationResidents.innerHTML = "";
+
+		selectedAccusations = [];
+
+		residents.forEach((resident) => {
+			const button = document.createElement("button");
+
+			button.classList.add("accusation-resident");
+
+			button.textContent = resident.name;
+
+			button.addEventListener("click", () => {
+				button.classList.toggle("selected");
+
+				if (selectedAccusations.includes(resident.name)) {
+					selectedAccusations = selectedAccusations.filter((name) => name !== resident.name);
+				} else {
+					selectedAccusations.push(resident.name);
+				}
+
+				console.log("Selected accusations:", selectedAccusations);
+			});
+
+			accusationResidents.appendChild(button);
+		});
+	} catch (error) {
+		console.error("Error loading accusation residents:", error);
+		accusationResidents.innerHTML = "<p>Could not load the residents.</p>";
+	}
+}
+closeAccusationBtn.addEventListener("click", () => {
+	accusationOverlay.style.display = "none";
+});
 nextDayButton.addEventListener("click", async () => {
 	if (investigationRunning) {
 		return;

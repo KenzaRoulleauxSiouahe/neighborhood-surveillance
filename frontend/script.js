@@ -205,15 +205,24 @@ async function newGame() {
 		}
 
 		startInvestigationButton.disabled = true;
-		const dayElement = document.getElementById("investigation-day");
 
-		if (dayElement) {
-			dayElement.textContent = "INVESTIGATION DAY 1";
-		}
-
-		await fetch(`${API_URL}/game/start`, {
+		const gameResponse = await fetch(`${API_URL}/game/start`, {
 			method: "POST",
 		});
+
+		const gameData = await gameResponse.json();
+
+		const dayElement = document.getElementById("investigation-day");
+
+		if (dayElement && gameData.game) {
+			const currentDate = new Date(gameData.game.currentDate);
+
+			const weekday = currentDate.toLocaleDateString("en-GB", {
+				weekday: "long",
+			});
+
+			dayElement.textContent = `INVESTIGATION DAY ${gameData.game.investigationDay} — ${weekday.toUpperCase()}`;
+		}
 
 		await loadCameras();
 
@@ -956,7 +965,13 @@ nextDayButton.addEventListener("click", async () => {
 		const dayElement = document.getElementById("investigation-day");
 
 		if (dayElement) {
-			dayElement.textContent = `INVESTIGATION DAY ${data.game.investigationDay}`;
+			const currentDate = new Date(data.game.currentDate);
+
+			const weekday = currentDate.toLocaleDateString("en-GB", {
+				weekday: "long",
+			});
+
+			dayElement.textContent = `INVESTIGATION DAY ${data.game.investigationDay} ${weekday.toUpperCase()}`;
 		}
 		const logsContainer = document.getElementById("logs");
 
@@ -1052,7 +1067,13 @@ async function resumeInvestigation() {
 		const dayElement = document.getElementById("investigation-day");
 
 		if (dayElement) {
-			dayElement.textContent = `INVESTIGATION DAY ${game.investigationDay}`;
+			const currentDate = new Date(game.currentDate);
+
+			const weekday = currentDate.toLocaleDateString("en-GB", {
+				weekday: "long",
+			});
+
+			dayElement.textContent = `INVESTIGATION DAY ${game.investigationDay} — ${weekday.toUpperCase()}`;
 		}
 		if (game.investigationDay >= 4 && !game.investigationRunning) {
 			console.log("Day 4 has already been completed.");

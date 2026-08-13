@@ -1295,3 +1295,27 @@ button:active {
 
 	font-size: 14px;
 }
+#result-new-game-btn {
+	display: block;
+	margin: 30px auto 0 auto;
+
+	padding: 12px 24px;
+	font-size: 15px;
+
+	background-color: transparent;
+	color: black;
+
+	border: 3px solid #800020;
+	cursor: pointer;
+
+	transition: 0.2s ease;
+}
+
+#result-new-game-btn:hover {
+	background-color: #800020;
+	color: white;
+}
+
+#result-new-game-btn:active {
+	transform: scale(0.95);
+}

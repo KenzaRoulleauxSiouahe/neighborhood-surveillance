@@ -38,14 +38,17 @@ router.post("/accuse", async (req, res) => {
 			isCultMember: true,
 		});
 
-		const cultMemberNames = cultMembers.map((resident) => resident.name);
+		const actualCultMembers = cultMembers.map((resident) => resident.name);
 
-		const correct = accusations.length === cultMemberNames.length && accusations.every((name) => cultMemberNames.includes(name));
+		const correctCount = accusations.filter((name) => actualCultMembers.includes(name)).length;
+
+		const correct = accusations.length === actualCultMembers.length && correctCount === actualCultMembers.length;
 
 		res.json({
 			correct: correct,
+			correctCount: correctCount,
 			selected: accusations,
-			actualCultMembers: correct ? cultMemberNames : undefined,
+			actualCultMembers: actualCultMembers,
 		});
 	} catch (error) {
 		console.error("Error checking accusation:", error);

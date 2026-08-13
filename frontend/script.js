@@ -44,6 +44,7 @@ const closeAccusationBtn = document.getElementById("close-accusation");
 const accusationResidents = document.getElementById("accusation-residents");
 const submitAccusationButton = document.getElementById("submit-accusation-btn");
 const accusationResult = document.getElementById("accusation-result");
+const resultNewGameButton = document.getElementById("result-new-game-btn");
 
 async function loadBriefingVictims() {
 	try {
@@ -781,11 +782,10 @@ accusationButton.addEventListener("click", async () => {
 submitAccusationButton.addEventListener("click", async () => {
 	if (selectedAccusations.length === 0) {
 		accusationResult.innerHTML = `
-            <p class="accusation-incorrect">
+            <p class="accusation-warning">
                 Please select at least one resident.
             </p>
         `;
-
 		return;
 	}
 
@@ -803,42 +803,89 @@ submitAccusationButton.addEventListener("click", async () => {
 		});
 
 		const result = await response.json();
+		console.log("Server response:", result);
 
 		if (!response.ok) {
 			throw new Error(result.error);
 		}
+		console.log("Accusation result:", result);
+
+		accusationResidents.style.display = "none";
+		submitAccusationButton.style.display = "none";
+
+		let resultTitle = "";
+		let resultMessage = "";
 
 		if (result.correct) {
-			accusationResult.innerHTML = `
-                <p class="accusation-correct">
-                    ✓ ACCUSATION CORRECT
-                </p>
-
+			resultTitle = "✓ ALL CORRECT";
+			resultMessage = `
                 <p>
                     You identified all members of the cult.
                 </p>
             `;
-		} else {
-			accusationResult.innerHTML = `
-                <p class="accusation-incorrect">
-                    ✕ ACCUSATION INCORRECT
-                </p>
-
+		} else if (result.correctCount > 0) {
+			resultTitle = "⚠ PARTIALLY CORRECT";
+			resultMessage = `
                 <p>
-                    Your investigation has not identified
-                    all of the cult members.
+                    You identified some members of the cult,
+                    but not all of them.
+                </p>
+            `;
+		} else {
+			resultTitle = "✕ ALL WRONG";
+			resultMessage = `
+                <p>
+                    None of your accusations were correct.
                 </p>
             `;
 		}
+
+		accusationResult.innerHTML = `
+            <div class="accusation-result-screen">
+
+                <h2>${resultTitle}</h2>
+
+                ${resultMessage}
+
+                ${
+									!result.correct
+										? `
+                            <div class="correct-answers">
+                                <h3>THE ACTUAL CULT MEMBERS WERE:</h3>
+
+                                <p>
+                                    ${result.actualCultMembers.join("<br>")}
+                                </p>
+                            </div>
+                        `
+										: ""
+								}
+
+            </div>
+        `;
+
+		resultNewGameButton.style.display = "block";
 	} catch (error) {
 		console.error("Error submitting accusation:", error);
 
 		accusationResult.innerHTML = `
-            <p class="accusation-incorrect">
-                Something went wrong while submitting
-                the accusation.
+            <p class="accusation-warning">
+                Something went wrong while submitting the accusation.
             </p>
         `;
+	}
+});
+resultNewGameButton.addEventListener("click", () => {
+	const confirmNewGame = confirm("Are you sure you want to start a new game? This will reset all camera placements and generate new locations.");
+
+	if (confirmNewGame) {
+		accusationOverlay.style.display = "none";
+		accusationResult.innerHTML = "";
+		resultNewGameButton.style.display = "none";
+		accusationResidents.style.display = "grid";
+		submitAccusationButton.style.display = "block";
+
+		newGame();
 	}
 });
 async function loadAccusationResidents() {
@@ -1029,6 +1076,7 @@ async function resumeInvestigation() {
 			nextDayButton.disabled = true;
 
 			accusationButton.style.display = "block";
+			accusationButton.disabled = false;
 
 			console.log("Final accusation is available.");
 

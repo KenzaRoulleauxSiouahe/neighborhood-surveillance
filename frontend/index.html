@@ -156,30 +156,6 @@
 						</div>
 					</div>
 				</div>
-				<button id="accusation-btn">⚖️ FINAL ACCUSATION</button>
-				<div id="accusation-overlay">
-					<div id="accusation-screen">
-						<button id="close-accusation" type="button">✕</button>
-
-						<h1>FINAL ACCUSATION</h1>
-
-						<div class="briefing-divider"></div>
-
-						<p class="accusation-description">All available surveillance evidence has been collected.</p>
-
-						<p class="accusation-description">Review the resident files and archived logs carefully.</p>
-
-						<h2>Who do you believe is a member of the cult?</h2>
-
-						<p class="accusation-instruction">Select all residents you believe are cult members.</p>
-
-						<div id="accusation-residents"></div>
-
-						<button id="submit-accusation-btn">SUBMIT ACCUSATION</button>
-
-						<div id="accusation-result"></div>
-					</div>
-				</div>
 			</div>
 			<div id="game-area">
 				<div id="map">
@@ -332,14 +308,39 @@
 						<div class="location-layer"></div>
 						<div class="murder-layer"></div>
 					</div>
+					<div id="game-actions">
+						<button id="accusation-btn">⚖️ FINAL ACCUSATION</button>
+						<div id="accusation-overlay">
+							<div id="accusation-screen">
+								<button id="close-accusation" type="button">✕</button>
 
-					<button id="new-game-btn">New Game</button>
+								<h1>FINAL ACCUSATION</h1>
+
+								<div class="briefing-divider"></div>
+
+								<p class="accusation-description">All available surveillance evidence has been collected.</p>
+
+								<p class="accusation-description">Review the resident files and archived logs carefully.</p>
+
+								<h2>Who do you believe is a member of the cult?</h2>
+
+								<p class="accusation-instruction">Select all residents you believe are cult members.</p>
+
+								<div id="accusation-residents"></div>
+
+								<button id="submit-accusation-btn">SUBMIT ACCUSATION</button>
+
+								<div id="accusation-result"></div>
+							</div>
+						</div>
+						<button id="new-game-btn">New Game</button>
+					</div>
 				</div>
 			</div>
 
 			<div id="camera-panel">
-				<button id="start-investigation-btn" disabled>START INVESTIGATION</button>
 				<button id="next-day-btn" disabled>START NEXT DAY</button>
+				<button id="start-investigation-btn" disabled>START INVESTIGATION</button>
 				<div id="game-clock">
 					<div id="investigation-day">INVESTIGATION DAY 1</div>
 					<div id="game-time">00:00:00</div>

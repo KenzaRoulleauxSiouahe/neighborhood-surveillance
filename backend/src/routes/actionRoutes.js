@@ -136,10 +136,15 @@ router.get("/archive", async (req, res) => {
 				error: "No active game found.",
 			});
 		}
+		let maxArchiveDay = game.investigationDay - 1;
+
+		if (!game.investigationRunning) {
+			maxArchiveDay = game.investigationDay;
+		}
 
 		const logs = await Log.find({
 			investigationDay: {
-				$lte: game.investigationDay,
+				$lte: maxArchiveDay,
 			},
 		}).sort({
 			investigationDay: 1,

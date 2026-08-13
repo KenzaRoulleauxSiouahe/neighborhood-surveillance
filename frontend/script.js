@@ -38,6 +38,7 @@ const startInvestigationButton = document.getElementById("start-investigation-bt
 const nextDayButton = document.getElementById("next-day-btn");
 const GAME_MINUTES_PER_REAL_SECOND = 24;
 const accusationButton = document.getElementById("accusation-btn");
+accusationButton.disabled = true;
 const accusationOverlay = document.getElementById("accusation-overlay");
 const closeAccusationBtn = document.getElementById("close-accusation");
 const accusationResidents = document.getElementById("accusation-residents");
@@ -426,7 +427,33 @@ function updateStartInvestigationButton() {
 
 	startInvestigationButton.disabled = false;
 }
+residentFilesButton.addEventListener("click", async () => {
+	residentFileOverlay.style.display = "flex";
 
+	await loadResidents();
+});
+
+closeResidentFileButton.addEventListener("click", () => {
+	residentFileOverlay.style.display = "none";
+});
+
+async function loadResidents() {
+	try {
+		const response = await fetch(`${API_URL}/residents`);
+
+		residentsData = await response.json();
+
+		console.log("Loaded residents:", residentsData);
+
+		displayResidentTabs();
+
+		if (residentsData.length > 0) {
+			displayResident(residentsData[0]);
+		}
+	} catch (error) {
+		console.error("Error loading residents:", error);
+	}
+}
 function displayResidentTabs() {
 	residentTabs.innerHTML = "";
 
@@ -715,6 +742,7 @@ startInvestigationButton.addEventListener("click", async () => {
 
 				if (updatedGame.investigationDay >= 4) {
 					nextDayButton.disabled = true;
+					accusationButton.disabled = false;
 					accusationButton.style.display = "block";
 
 					const logsContainer = document.getElementById("logs");
@@ -733,7 +761,6 @@ startInvestigationButton.addEventListener("click", async () => {
 				}
 			} else {
 				nextDayButton.disabled = false;
-				
 			}
 		}, 1000);
 	} catch (error) {

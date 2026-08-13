@@ -405,6 +405,10 @@ button:active {
 #new-game-btn:active {
 	transform: scale(0.95);
 }
+#accusation-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
 #camera-logs {
 	width: 250px;
 	height: 430px;

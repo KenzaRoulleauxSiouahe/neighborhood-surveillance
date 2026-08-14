@@ -48,7 +48,7 @@ function randomActivity(startHour, endHour) {
 	return generateAction(startHour, endHour);
 }
 
-async function generateDailyRoutine(resident, day, murderSpots = [], isSuspiciousToday = false) {
+async function generateDailyRoutine(resident, day, murderSpots = [], allResidents = []) {
 	const routine = roleRoutines[resident.role];
 	const houseLocation = await Location.findOne({
 		name: resident.house,
@@ -133,8 +133,12 @@ async function generateDailyRoutine(resident, day, murderSpots = [], isSuspiciou
 			})),
 		);
 	}
-	if (isSuspiciousToday && murderSpots.length > 0) {
-		const suspiciousActivity = generateSuspiciousActivity(murderSpots);
+	const cultMember = resident.isCultMember;
+
+	const suspiciousChance = cultMember ? 0.55 : 0.25;
+
+	if (Math.random() < suspiciousChance) {
+		const suspiciousActivity = await generateSuspiciousActivity(murderSpots, resident, allResidents);
 
 		if (suspiciousActivity) {
 			logs.push(suspiciousActivity);

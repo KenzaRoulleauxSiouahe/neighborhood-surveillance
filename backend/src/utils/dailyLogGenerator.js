@@ -18,19 +18,8 @@ async function generateDailyLogs(residents, gameDate, investigationDay) {
 
 	const day = dayNames[date.getDay()];
 
-	const cultMembers = residents.filter((resident) => resident.isCultMember);
-
-	const suspiciousCount = Math.floor(Math.random() * (cultMembers.length + 1));
-
-	const shuffledCultMembers = [...cultMembers].sort(() => Math.random() - 0.5);
-
-	const suspiciousResidents = shuffledCultMembers.slice(0, suspiciousCount);
-
-	const suspiciousResidentIds = new Set(suspiciousResidents.map((resident) => resident._id.toString()));
-
 	for (const resident of residents) {
-		const isSuspiciousToday = suspiciousResidentIds.has(resident._id.toString());
-		const routine = await generateDailyRoutine(resident, day, murderSpots, isSuspiciousToday);
+		const routine = await generateDailyRoutine(resident, day, murderSpots, residents);
 		for (const action of routine) {
 			let zone = null;
 

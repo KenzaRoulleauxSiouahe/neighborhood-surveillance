@@ -1,5 +1,5 @@
 const roleTypes = {
-	worker: ["Police Officer", "Teacher", "Cashier", "Shop owner", "Forestkeeper", "Gravekeeper"],
+	worker: ["Police Officer", "Teacher", "Cashier", "Shop owner", "Forest Keeper", "Gravekeeper"],
 
 	outsideWorker: ["Doctor"],
 

@@ -8,6 +8,8 @@
 
         - PATCH request method - HTTP | MDN. (2026, June 22). https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/PATCH
 
+        - Request: fetch() method - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch
+
         - Response: json() method - Web APIs | MDN. (2025, August 19). https://developer.mozilla.org/en-US/docs/Web/API/Response/json
 
 
@@ -36,8 +38,20 @@
 
         - Document: querySelector() method - Web APIs | MDN. (2026, July 15). https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector
 
+        - Element: classList property - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
+
+        - HTMLElement: dataset property - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset
+
+        - HTMLElement: style property - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style
+
+        - W3Schools.com. (n.d.). https://www.w3schools.com/jsref/prop_pushbutton_disabled.asp
+
 
         ##Event & User Interaction
+
+        - Window: alert() method - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/alert
+
+        - Window: confirm() method - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm
 
         - EventTarget: addEventListener() method - Web APIs | MDN. (2026, May 22). https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
 
@@ -49,9 +63,43 @@
 
         ##JS Fundamentals
 
+        - Array.prototype.filter() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+
+        - Array.prototype.find() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+
+        - Array.prototype.forEach() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
+
+        - Array.prototype.includes() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
+
+        - Array.prototype.join() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join
+
+        - Array.prototype.map() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
+
+        - Array.prototype.sort() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+
+        - Array.isArray() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+
         - Camel case - Glossary | MDN. (2025, July 11). https://developer.mozilla.org/en-US/docs/Glossary/Camel_case
 
+        - clearInterval() - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/clearInterval
+
+        - Date.prototype.getDay() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getDay
+
+        - Destructuring assignment - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring
+
+        - Math.random() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+
+        - Number() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number
+
         - Object - JavaScript | MDN. (2026, May 22). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+        - Optional chaining (?.) - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
+
+        - parseInt() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseInt
+
+        - sessionStorage - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
+
+        - setInterval() - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval
 
         - Skylark, A. (2025a, January 13). Master Logical Operators in JavaScript: A quick guide. Master Logical Operators in JavaScript: A Quick Guide - Topic. https://d-libro.com/topic/logical-operators/
 
@@ -65,9 +113,17 @@
 
         - Skylark, A. (2025f, January 13). Mastering Spaces & Indentation in JavaScript code. Mastering Spaces & Indentation in JavaScript Code - Topic. https://d-libro.com/topic/spaces-and-indentation
 
+        - Spread syntax - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
 
+        - String.prototype.localeCompare() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
 
-    ##Back-end
+        - String.prototype.padStart() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+
+        - String.prototype.replace() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
+
+        - String.prototype.startsWith() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
+
+##Back-end
 
         ##API Routes / Express Routing
 
@@ -173,3 +229,5 @@
         - async function - JavaScript | MDN. (2025, July 8). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
 
         - await - JavaScript | MDN. (2025, July 8). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await
+
+        - GeeksforGeeks. (2024, May 31). Synchronous and asynchronous programming. GeeksforGeeks. https://www.geeksforgeeks.org/javascript/synchronous-and-asynchronous-programming/

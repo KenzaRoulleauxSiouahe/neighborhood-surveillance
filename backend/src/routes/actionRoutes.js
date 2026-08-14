@@ -80,16 +80,9 @@ router.post("/next-day", async (req, res) => {
 
 		await game.save();
 
-		const residents = await Resident.find();
-
-		const logs = await generateDailyLogs(residents, game.currentDate, game.investigationDay);
-
-		await Log.insertMany(logs);
-
 		res.json({
 			message: `Investigation Day ${game.investigationDay} started.`,
 			game,
-			logs,
 		});
 	} catch (error) {
 		console.error("Error starting next investigation day:", error);

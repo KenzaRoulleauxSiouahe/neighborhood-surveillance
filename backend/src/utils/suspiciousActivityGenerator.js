@@ -69,6 +69,13 @@ async function randomSuspiciousActivity(murderSpots, resident, allResidents = []
 				suspicionLevel: 2,
 			});
 			activities.push({
+				action: `Watched ${otherResident.house}`,
+				location: otherResident.house,
+				minHour: 0,
+				maxHour: 4,
+				suspicionLevel: 2,
+			});
+			activities.push({
 				action: `Entered ${otherResident.house}`,
 				location: otherResident.house,
 				minHour: 2,

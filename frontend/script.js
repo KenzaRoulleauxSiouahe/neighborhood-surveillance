@@ -919,13 +919,25 @@ async function loadAccusationResidents() {
 			button.textContent = resident.name;
 
 			button.addEventListener("click", () => {
-				button.classList.toggle("selected");
-
 				if (selectedAccusations.includes(resident.name)) {
 					selectedAccusations = selectedAccusations.filter((name) => name !== resident.name);
+
+					button.classList.remove("selected");
 				} else {
+					if (selectedAccusations.length >= 3) {
+						return;
+					}
+
 					selectedAccusations.push(resident.name);
+
+					button.classList.add("selected");
 				}
+
+				document.querySelectorAll(".accusation-resident").forEach((residentButton) => {
+					const isSelected = residentButton.classList.contains("selected");
+
+					residentButton.disabled = selectedAccusations.length >= 3 && !isSelected;
+				});
 
 				console.log("Selected accusations:", selectedAccusations);
 			});

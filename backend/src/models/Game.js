@@ -1,6 +1,12 @@
 const mongoose = require("mongoose");
 
 const gameSchema = new mongoose.Schema({
+	playerId: {
+		type: String,
+		required: true,
+		index: true,
+	},
+
 	startDate: {
 		type: Date,
 		required: true,

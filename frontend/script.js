@@ -10,6 +10,7 @@ let investigationStartTime = null;
 let gameClockInterval = null;
 let gameStartRealTime = null;
 let selectedAccusations = [];
+let playerId = localStorage.getItem("playerId");
 
 const API_URL = "http://localhost:5000/api";
 const cameraColors = {
@@ -48,6 +49,13 @@ const resultNewGameButton = document.getElementById("result-new-game-btn");
 const caseReportButton = document.getElementById("case-report-btn");
 const caseReportOverlay = document.getElementById("case-report-overlay");
 const closeCaseReportButton = document.getElementById("close-case-report");
+
+if (!playerId) {
+	playerId = crypto.randomUUID();
+	localStorage.setItem("playerId", playerId);
+}
+
+console.log("Player ID:", playerId);
 
 async function loadBriefingVictims() {
 	try {
@@ -172,7 +180,6 @@ loadCameras();
 loadLocations();
 loadMurderSpots();
 loadBriefingVictims();
-resumeInvestigation();
 
 if (sessionStorage.getItem("briefingSeen") === "true") {
 	hideBriefing();
@@ -209,8 +216,16 @@ async function newGame() {
 
 		startInvestigationButton.disabled = true;
 
+		const playerId = localStorage.getItem("playerId");
+
 		const gameResponse = await fetch(`${API_URL}/game/start`, {
 			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				playerId: playerId,
+			}),
 		});
 
 		const gameData = await gameResponse.json();
@@ -636,7 +651,7 @@ startInvestigationButton.addEventListener("click", async () => {
 		return;
 	}
 
-	const gameResponse = await fetch(`${API_URL}/game/active`);
+	const gameResponse = await fetch(`${API_URL}/game/active?playerId=${playerId}`);
 
 	if (!gameResponse.ok) {
 		console.error("Could not find active game.");
@@ -680,7 +695,7 @@ startInvestigationButton.addEventListener("click", async () => {
 
 		console.log("Visible camera logs:", visibleLogs);
 
-		const updatedGameResponse = await fetch(`${API_URL}/game/active`);
+		const updatedGameResponse = await fetch(`${API_URL}/game/active?playerId=${playerId}`);
 
 		if (!updatedGameResponse.ok) {
 			throw new Error("Could not find active game.");
@@ -1069,11 +1084,15 @@ function updateGameClock() {
 
 async function resumeInvestigation() {
 	try {
-		const response = await fetch(`${API_URL}/game/active`);
+		const response = await fetch(`${API_URL}/game/active?playerId=${playerId}`);
+
+		if (response.status === 404) {
+			console.log("No active game yet.");
+			return;
+		}
 
 		if (!response.ok) {
-			console.log("No active investigation.");
-			return;
+			throw new Error(`Failed to load active game: ${response.status}`);
 		}
 
 		const game = await response.json();
@@ -1161,6 +1180,7 @@ async function resumeInvestigation() {
 	}
 }
 
+resumeInvestigation();
 function startInvestigationLogPlayback(visibleLogs, investigationStartedAt) {
 	if (investigationTimer) {
 		clearInterval(investigationTimer);
@@ -1221,7 +1241,7 @@ closeCaseReportButton.addEventListener("click", () => {
 
 async function generateCaseReport() {
 	try {
-		const gameResponse = await fetch(`${API_URL}/game/active`);
+		const gameResponse = await fetch(`${API_URL}/game/active?playerId=${playerId}`);
 
 		if (!gameResponse.ok) {
 			throw new Error("Could not load game data.");

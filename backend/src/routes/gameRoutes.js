@@ -4,6 +4,7 @@ const router = express.Router();
 const Camera = require("../models/Camera");
 const Resident = require("../models/Resident");
 const Game = require("../models/Game");
+const User = require("../models/User");
 
 const chooseCultMembers = require("../utils/cultGenerator");
 
@@ -13,6 +14,22 @@ const Log = require("../models/Log");
 
 router.post("/start", async (req, res) => {
 	try {
+		const { playerId } = req.body;
+
+		if (!playerIdId) {
+			return res.status(400).json({
+				error: "User ID is required.",
+			});
+		}
+		await User.findOneAndUpdate(
+			{ uid: playerId },
+			{ uid: playerId },
+			{
+				upsert: true,
+				new: true,
+				setDefaultsOnInsert: true,
+			},
+		);
 		await Log.deleteMany();
 		await Camera.deleteMany();
 
@@ -55,6 +72,7 @@ router.post("/start", async (req, res) => {
 		await Game.deleteMany();
 
 		const game = await Game.create({
+			playerId,
 			startDate,
 			currentDate,
 			deadlineDate,
@@ -81,7 +99,16 @@ router.post("/start", async (req, res) => {
 
 router.get("/active", async (req, res) => {
 	try {
+		const { playerId } = req.query;
+
+		if (!playerId) {
+			return res.status(400).json({
+				error: "Player UID is required.",
+			});
+		}
+
 		const game = await Game.findOne({
+			playerId: playerId,
 			status: "active",
 		});
 

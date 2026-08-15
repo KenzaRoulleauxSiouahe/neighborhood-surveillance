@@ -32,13 +32,25 @@ router.patch("/reset", async (req, res) => {
 
 router.patch("/:id/coverage", async (req, res) => {
 	try {
-		const camera = await Camera.findByIdAndUpdate(
-			req.params.id,
-			{
-				coveredZones: req.body.coveredZones,
-			},
-			{ new: true },
-		);
+		const camera = await Camera.findById(req.params.id);
+
+		if (!camera) {
+			return res.status(404).json({
+				error: "Camera not found.",
+			});
+		}
+
+		const newZones = req.body.coveredZones || [];
+
+		camera.coveredZones = newZones;
+
+		newZones.forEach((zone) => {
+			if (!camera.coverageHistory.includes(zone)) {
+				camera.coverageHistory.push(zone);
+			}
+		});
+
+		await camera.save();
 
 		res.json(camera);
 	} catch (error) {

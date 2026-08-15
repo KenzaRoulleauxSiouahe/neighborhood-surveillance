@@ -45,6 +45,9 @@ const accusationResidents = document.getElementById("accusation-residents");
 const submitAccusationButton = document.getElementById("submit-accusation-btn");
 const accusationResult = document.getElementById("accusation-result");
 const resultNewGameButton = document.getElementById("result-new-game-btn");
+const caseReportButton = document.getElementById("case-report-btn");
+const caseReportOverlay = document.getElementById("case-report-overlay");
+const closeCaseReportButton = document.getElementById("close-case-report");
 
 async function loadBriefingVictims() {
 	try {
@@ -874,6 +877,7 @@ submitAccusationButton.addEventListener("click", async () => {
         `;
 
 		resultNewGameButton.style.display = "block";
+		caseReportButton.style.display = "block";
 	} catch (error) {
 		console.error("Error submitting accusation:", error);
 
@@ -1207,4 +1211,121 @@ function startInvestigationLogPlayback(visibleLogs, investigationStartedAt) {
 	checkLogs();
 
 	investigationTimer = setInterval(checkLogs, 1000);
+}
+caseReportButton.addEventListener("click", async () => {
+	await generateCaseReport();
+});
+closeCaseReportButton.addEventListener("click", () => {
+	caseReportOverlay.style.display = "none";
+});
+
+async function generateCaseReport() {
+	try {
+		const gameResponse = await fetch(`${API_URL}/game/active`);
+
+		if (!gameResponse.ok) {
+			throw new Error("Could not load game data.");
+		}
+
+		const game = await gameResponse.json();
+
+		const residentsResponse = await fetch(`${API_URL}/residents`);
+
+		if (!residentsResponse.ok) {
+			throw new Error("Could not load residents.");
+		}
+
+		const residents = await residentsResponse.json();
+
+		const camerasResponse = await fetch(`${API_URL}/cameras`);
+
+		if (!camerasResponse.ok) {
+			throw new Error("Could not load cameras.");
+		}
+
+		const cameras = await camerasResponse.json();
+
+		const logsResponse = await fetch(`${API_URL}/actions/logs`);
+
+		let logs = [];
+
+		if (logsResponse.ok) {
+			logs = await logsResponse.json();
+		}
+
+		const murdersResponse = await fetch(`${API_URL}/murder-spots`);
+
+		let murders = [];
+
+		if (murdersResponse.ok) {
+			murders = await murdersResponse.json();
+		}
+
+		document.getElementById("report-victims").textContent = murders.length;
+
+		document.getElementById("report-residents").textContent = residents.length;
+
+		document.getElementById("report-cameras").textContent = cameras.length;
+
+		document.getElementById("report-days").textContent = `${Math.min(game.investigationDay, 4)} / 4`;
+
+		const coverageContainer = document.getElementById("report-camera-coverage");
+
+		if (!coverageContainer) {
+			throw new Error("Camera coverage container not found.");
+		}
+
+		coverageContainer.innerHTML = "";
+
+		cameras.forEach((camera) => {
+			const coveredZones = camera.coverageHistory || [];
+
+			const percentage = Math.min((coveredZones.length / 4) * 100, 100);
+
+			const row = document.createElement("div");
+
+			row.className = "coverage-row";
+
+			row.innerHTML = `
+				<span class="coverage-zone">
+					${camera.name}
+				</span>
+
+				<div
+					class="coverage-bar"
+					style="--coverage: ${Math.max(percentage, 5)}%"
+				></div>
+
+				<span class="coverage-number">
+					${coveredZones.length} zones
+				</span>
+			`;
+
+			coverageContainer.appendChild(row);
+		});
+
+		const suspiciousEvents = logs.filter((log) => log.suspicious === true);
+
+		const suspiciousCount = suspiciousEvents.length;
+
+		document.getElementById("report-suspicious-events").textContent = suspiciousCount;
+
+		const eventPercentage = Math.min(suspiciousCount * 5, 100);
+
+		document.getElementById("suspicious-event-bar").style.width = `${eventPercentage}%`;
+
+		document.getElementById("summary-days").textContent = Math.min(game.investigationDay, 4);
+
+		document.getElementById("summary-observations").textContent = logs.length;
+
+		document.getElementById("summary-events").textContent = suspiciousCount;
+
+		document.getElementById("summary-residents").textContent = residents.length;
+
+		caseReportOverlay.style.display = "flex";
+
+		console.log("Case report generated.");
+	} catch (error) {
+		console.error("Error generating case report:", error);
+	}
 }

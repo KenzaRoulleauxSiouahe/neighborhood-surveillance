@@ -331,10 +331,89 @@
 								<button id="submit-accusation-btn">SUBMIT ACCUSATION</button>
 
 								<div id="accusation-result"></div>
-								<button id="result-new-game-btn" style="display: none">NEW GAME</button>
+								<div id="result-actions">
+									<button id="result-new-game-btn" style="display: none">NEW GAME</button>
+
+									<button id="case-report-btn" style="display: none">📋 VIEW CASE REPORT</button>
+								</div>
 							</div>
 						</div>
 						<button id="new-game-btn">New Game</button>
+					</div>
+				</div>
+				<div id="case-report-overlay" class="overlay">
+					<div class="case-report">
+						<button id="close-case-report" type="button">✕</button>
+						<div class="case-report-header">
+							<div class="file-stamp">FINISHED INVESTIGATION</div>
+							<h1>CASE REPORT</h1>
+							<p>FINAL INVESTIGATION SUMMARY</p>
+						</div>
+						<selection class="report-selection">
+							<h2>CASE OVERVIEW</h2>
+							<div class="overview-grid">
+								<div>
+									<span class="report-label">VICTIMS</span>
+									<strong id="report-victims">0</strong>
+								</div>
+
+								<div>
+									<span class="report-label">RESIDENTS</span>
+									<strong id="report-residents">0</strong>
+								</div>
+
+								<div>
+									<span class="report-label">CAMERAS</span>
+									<strong id="report-cameras">0</strong>
+								</div>
+
+								<div>
+									<span class="report-label">INVESTIGATION</span>
+									<strong id="report-days">0 / 4</strong>
+								</div>
+							</div>
+						</selection>
+						<section class="report-section">
+							<h2>CAMERA COVERAGE</h2>
+
+							<div id="report-camera-coverage" class="coverage-list"></div>
+						</section>
+
+						<section class="report-section">
+							<h2>SUSPICIOUS EVENTS</h2>
+
+							<div class="event-visual">
+								<div id="suspicious-event-bar"></div>
+								<span id="report-suspicious-events">0</span>
+							</div>
+						</section>
+						<section class="report-section">
+							<h2>INVESTIGATION SUMMARY</h2>
+
+							<div class="summary-list">
+								<p>
+									<span>Days investigated</span>
+									<strong id="summary-days">0</strong>
+								</p>
+
+								<p>
+									<span>Camera observations</span>
+									<strong id="summary-observations">0</strong>
+								</p>
+
+								<p>
+									<span>Suspicious events</span>
+									<strong id="summary-events">0</strong>
+								</p>
+
+								<p>
+									<span>Residents investigated</span>
+									<strong id="summary-residents">0</strong>
+								</p>
+							</div>
+						</section>
+
+						<div class="case-result-stamp" id="case-result-stamp">CASE CLOSED</div>
 					</div>
 				</div>
 			</div>

@@ -15,6 +15,11 @@ const cameraSchema = new mongoose.Schema({
 		type: [String],
 		default: [],
 	},
+
+	coverageHistory: {
+		type: [String],
+		default: [],
+	},
 });
 
 module.exports = mongoose.model("Camera", cameraSchema);

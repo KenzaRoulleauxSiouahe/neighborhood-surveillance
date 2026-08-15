@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+require("dotenv").config({ path: "../.env" });
 
 const Resident = require("./src/models/Resident");
 const residentRoutes = require("./src/routes/residentRoutes");
@@ -36,7 +37,7 @@ app.use("/api/actions", actionRoutes);
 app.use("/api/murder-spots", murderSpotRoutes);
 
 mongoose
-	.connect("mongodb://localhost:27017/neighbourhood-surveillance")
+	.connect(process.env.MONGO_URI)
 	.then(() => {
 		console.log("Connected to MongoDB");
 	})

@@ -1073,7 +1073,8 @@ async function resumeInvestigation() {
 		}
 
 		const game = await response.json();
-
+		accusationButton.disabled = true;
+		accusationButton.style.display = "block";
 		console.log("Active game:", game);
 
 		const dayElement = document.getElementById("investigation-day");

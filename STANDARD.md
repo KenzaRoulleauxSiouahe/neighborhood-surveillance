@@ -12,10 +12,16 @@
 
         - Response: json() method - Web APIs | MDN. (2025, August 19). https://developer.mozilla.org/en-US/docs/Web/API/Response/json
 
+        - HTTP response status codes - HTTP | MDN. (2026, January 5). https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+
+        - HTTP request methods - HTTP | MDN. (2025, July 4). https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
+
 
         ##Server Routing
 
         - Routing · Express.js. (n.d.). Express.js. https://expressjs.com/en/guide/routing/
+
+        - 4.x API Reference · Express.js 4.x. (n.d.). Express.js. https://expressjs.com/en/4x/api.html#req
 
 
         ##CSS Layout / Styling
@@ -28,6 +34,28 @@
         ##Database / MongoDB
 
         - MongoDB Node.js driver - Node.js driver - MongoDB docs. (n.d.). https://www.mongodb.com/docs/drivers/node/current/
+
+        - Mongoose - Mongoose v9.9.1. (n.d.). https://mongoosejs.com/docs/
+
+        - Mongoose - Mongoose v9.9.1. (n.d.). https://mongoosejs.com/docs/api/mongoose.html
+
+        - Connecting to MongoDB - Mongoose V9.9.1. (n.d.). https://mongoosejs.com/docs/connections.html
+
+        - Models - Mongoose V9.9.1. (n.d.). https://mongoosejs.com/docs/models.html
+
+        - SchemaTypes - Mongoose v9.9.1. (n.d.). https://mongoosejs.com/docs/schematypes.html
+
+        - Validation - Mongoose v9.9.1. (n.d.). https://mongoosejs.com/docs/validation.html
+
+        - Defaults - Mongoose v9.9.1. (n.d.). https://mongoosejs.com/docs/defaults.html
+
+        - Queries - Mongoose v9.9.1. (n.d.). https://mongoosejs.com/docs/queries.html
+
+        - Team, M. D. (n.d.-a). Create documents. Database Manual - MongoDB Docs. https://www.mongodb.com/docs/manual/tutorial/insert-documents/
+
+        - Team, M. D. (n.d.-c). db.collection.deleteMany() (mongosh method). Database Manual - MongoDB Docs. https://www.mongodb.com/docs/manual/reference/method/db.collection.deletemany/
+
+        - Team, M. D. (n.d.-b). Data modeling in MongoDB. Database Manual - MongoDB Docs. https://www.mongodb.com/docs/manual/data-modeling/
 
 
         ##DOM Manipulation
@@ -46,6 +74,12 @@
 
         - W3Schools.com. (n.d.). https://www.w3schools.com/jsref/prop_pushbutton_disabled.asp
 
+        - Web Storage API - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
+
+        - Window: localStorage property - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+
+        - Crypto: randomUUID() method - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID
+
 
         ##Event & User Interaction
 
@@ -59,6 +93,8 @@
         ##JS Asynchronous Programming
 
         - async function - JavaScript | MDN. (2025, July 8). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
+
+        - await - JavaScript | MDN. (2025, July 8). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await
 
 
         ##JS Fundamentals
@@ -80,6 +116,12 @@
         - Array.isArray() - JavaScript | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
 
         - Camel case - Glossary | MDN. (2025, July 11). https://developer.mozilla.org/en-US/docs/Glossary/Camel_case
+
+        - Crypto: randomUUID() method - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID
+
+        - sessionStorage - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
+
+        - setInterval() - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval
 
         - clearInterval() - Web APIs | MDN. (n.d.). https://developer.mozilla.org/en-US/docs/Web/API/Window/clearInterval
 
@@ -231,3 +273,5 @@
         - await - JavaScript | MDN. (2025, July 8). https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await
 
         - GeeksforGeeks. (2024, May 31). Synchronous and asynchronous programming. GeeksforGeeks. https://www.geeksforgeeks.org/javascript/synchronous-and-asynchronous-programming/
+
+ChatpGPT link: https://chatgpt.com/share/6a81f591-0d78-83eb-99b5-448c65bc0cf1

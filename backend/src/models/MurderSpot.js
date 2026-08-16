@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Stores the location, date, and victim of each murder in the game.
 const murderSpotSchema = new mongoose.Schema({
 	zone: {
 		type: String,

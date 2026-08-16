@@ -3,21 +3,13 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config({ path: "../.env" });
 
-const Resident = require("./src/models/Resident");
 const residentRoutes = require("./src/routes/residentRoutes");
-
-const Location = require("./src/models/Location");
 const locationRoutes = require("./src/routes/locationRoutes");
-
 const cameraRoutes = require("./src/routes/cameraRoutes");
-const Camera = require("./src/models/Camera");
-
 const gameRoutes = require("./src/routes/gameRoutes");
 const locationGameRoutes = require("./src/routes/locationGameRoutes.js");
-
 const zoneRoutes = require("./src/routes/zoneRoutes");
 const actionRoutes = require("./src/routes/actionRoutes");
-
 const murderSpotRoutes = require("./src/routes/murderSpotRoutes");
 
 const app = express();
@@ -27,6 +19,7 @@ app.use(express.json());
 
 const port = process.env.PORT || 5000;
 
+// API routes
 app.use("/api/residents", residentRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/cameras", cameraRoutes);
@@ -36,6 +29,7 @@ app.use("/api/zones", zoneRoutes);
 app.use("/api/actions", actionRoutes);
 app.use("/api/murder-spots", murderSpotRoutes);
 
+// Connect to MongoDB
 mongoose
 	.connect(process.env.MONGO_URI)
 	.then(() => {
@@ -45,6 +39,7 @@ mongoose
 		console.error("Error connecting to MongoDB:", err);
 	});
 
+// Basic server health check
 app.get("/", (req, res) => {
 	res.send("neighbourhood Surveillance is running!");
 });

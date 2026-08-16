@@ -132,6 +132,26 @@ router.patch("/finish-investigation", async (req, res) => {
 		if (!game) {
 			return res.status(400).json({ error: "No active game found." });
 		}
+
+		const cameras = await Camera.find();
+
+		for (const camera of cameras) {
+			if (camera.coveredZones.length > 0) {
+				const currentZone = camera.coveredZones[0];
+
+				const alreadyRecorded = camera.coverageHistory.some((entry) => entry.day === game.investigationDay);
+
+				if (!alreadyRecorded) {
+					camera.coverageHistory.push({
+						day: game.investigationDay,
+						zone: currentZone,
+					});
+
+					await camera.save();
+				}
+			}
+		}
+
 		game.investigationRunning = false;
 		game.investigationStartedAt = null;
 		await game.save();

@@ -4,10 +4,12 @@ const victims = ["Negan Smith", "Abraham Ford", "Carl Grimes", "Shane Walsh", "A
 
 const MurderSpot = require("../models/MurderSpot");
 
+// Returns a shuffled copy of an array.
 function shuffle(array) {
-	return array.sort(() => Math.random() - 0.5);
+	return array.toSorted(() => Math.random() - 0.5);
 }
 
+// Generates three previous murder locations and victims for the game.
 async function generateMurderSpots(gameDate) {
 	const availableVictims = shuffle([...victims]);
 	const availableZones = shuffle([...zones]);

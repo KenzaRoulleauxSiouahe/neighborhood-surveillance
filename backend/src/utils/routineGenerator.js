@@ -7,7 +7,7 @@ const roleRoutines = {
 		freeDays: ["Saturday", "Sunday"],
 	},
 
-	"Doctor": {
+	Doctor: {
 		workplace: "Hospital",
 		outsideVillage: true,
 		start: "05:00",
@@ -23,7 +23,7 @@ const roleRoutines = {
 		freeDays: ["Tuesday", "Saturday"],
 	},
 
-	"Teacher": {
+	Teacher: {
 		workplace: "School",
 		outsideVillage: false,
 		start: "07:00",
@@ -31,7 +31,7 @@ const roleRoutines = {
 		freeDays: ["Saturday", "Sunday"],
 	},
 
-	"Student": {
+	Student: {
 		workplace: "School",
 		outsideVillage: false,
 		start: "08:00",
@@ -47,12 +47,12 @@ const roleRoutines = {
 		freeDays: ["Monday", "Thursday"],
 	},
 
-	"Artist": {
+	Artist: {
 		workplace: null,
 		freeDays: [],
 	},
 
-	"Retired": {
+	Retired: {
 		workplace: null,
 		freeDays: [],
 	},
@@ -65,7 +65,7 @@ const roleRoutines = {
 		freeDays: ["Sunday", "Monday"],
 	},
 
-	"Cashier": {
+	Cashier: {
 		workplace: "Supermarket",
 		outsideVillage: false,
 		start: "10:00",

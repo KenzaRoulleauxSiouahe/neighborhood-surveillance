@@ -5,6 +5,7 @@ const suspiciousActions = ["Entered", "Visited", "Stayed near", "Walked to", "Wa
 async function randomSuspiciousActivity(murderSpots, resident, allResidents = []) {
 	const activities = [];
 
+	// Add previous crime scenes as possible suspicious locations.
 	if (murderSpots && murderSpots.length > 0) {
 		murderSpots.forEach((murderSpot) => {
 			const murderZone = murderSpot.zone || murderSpot.location || murderSpot;
@@ -27,17 +28,15 @@ async function randomSuspiciousActivity(murderSpots, resident, allResidents = []
 
 	suspiciousLocations.forEach((location) => {
 		activities.push({
-			action: location.type === "school" ? "Entered" : location.type === "police" ? "Entered" : "Visited",
-
+			action: location.type === "school" || location.type === "police" ? "Entered" : "Visited",
 			location: location.name,
-
 			minHour: 0,
 			maxHour: 4,
-
-			suspicionLevel: location.type === "school" || location.type === "police" ? 2 : 2,
+			suspicionLevel: 2,
 		});
 	});
 
+	// Add suspicious activity around the resident's own house.
 	if (resident) {
 		activities.push({
 			action: "Was seen walking alone",
@@ -61,6 +60,7 @@ async function randomSuspiciousActivity(murderSpots, resident, allResidents = []
 				maxHour: 4,
 				suspicionLevel: 2,
 			});
+
 			activities.push({
 				action: `Watched ${otherResident.house}`,
 				location: otherResident.house,
@@ -68,13 +68,7 @@ async function randomSuspiciousActivity(murderSpots, resident, allResidents = []
 				maxHour: 4,
 				suspicionLevel: 2,
 			});
-			activities.push({
-				action: `Watched ${otherResident.house}`,
-				location: otherResident.house,
-				minHour: 0,
-				maxHour: 4,
-				suspicionLevel: 2,
-			});
+
 			activities.push({
 				action: `Entered ${otherResident.house}`,
 				location: otherResident.house,

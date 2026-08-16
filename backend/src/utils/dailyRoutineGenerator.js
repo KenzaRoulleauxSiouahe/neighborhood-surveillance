@@ -3,6 +3,7 @@ const Location = require("../models/Location");
 const generateAction = require("./actionGenerator");
 const generateSuspiciousActivity = require("./suspiciousActivityGenerator");
 
+// Adds a random variation to a given time.
 function randomizeTime(time, variation = 10) {
 	let [hours, minutes] = time.split(":").map(Number);
 
@@ -25,6 +26,7 @@ function randomizeTime(time, variation = 10) {
 	return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
+// Adds a number of minutes to a given time.
 function addMinutes(time, amount) {
 	let [hours, minutes] = time.split(":").map(Number);
 
@@ -38,6 +40,7 @@ function addMinutes(time, amount) {
 	return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
+// Randomly decides whether a resident performs an additional activity.
 function randomActivity(startHour, endHour) {
 	const chance = Math.random();
 
@@ -48,8 +51,10 @@ function randomActivity(startHour, endHour) {
 	return generateAction(startHour, endHour);
 }
 
+// Generates the daily routine and possible suspicious activity for a resident.
 async function generateDailyRoutine(resident, day, murderSpots = [], allResidents = []) {
 	const routine = roleRoutines[resident.role];
+
 	const houseLocation = await Location.findOne({
 		name: resident.house,
 	});
@@ -133,8 +138,9 @@ async function generateDailyRoutine(resident, day, murderSpots = [], allResident
 			})),
 		);
 	}
-	const cultMember = resident.isCultMember;
 
+	// Cult members have a higher chance of generating suspicious activity.
+	const cultMember = resident.isCultMember;
 	const suspiciousChance = cultMember ? 0.55 : 0.25;
 
 	if (Math.random() < suspiciousChance) {
@@ -144,6 +150,8 @@ async function generateDailyRoutine(resident, day, murderSpots = [], allResident
 			logs.push(suspiciousActivity);
 		}
 	}
+
+	// Sort all activities chronologically before returning them.
 	return logs.sort((a, b) => {
 		const timeA = a.time.split(":").map(Number);
 		const timeB = b.time.split(":").map(Number);

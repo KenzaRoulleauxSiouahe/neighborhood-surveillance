@@ -1,5 +1,6 @@
 const roleTypes = {
-	worker: ["Police Officer", "Teacher", "Cashier", "Shop owner", "Forest Keeper", "Gravekeeper"],
+	// Groups resident roles according to their daily routine.
+	worker: ["Police Officer", "Teacher", "Cashier", "Shop Owner", "Forest Keeper", "Grave Keeper"],
 
 	outsideWorker: ["Doctor"],
 

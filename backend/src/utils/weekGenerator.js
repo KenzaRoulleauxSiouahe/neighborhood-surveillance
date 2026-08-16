@@ -2,7 +2,6 @@ const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 
 function generateWeek() {
 	const week = [];
-
 	const startDate = new Date();
 
 	days.forEach((day, index) => {
@@ -11,8 +10,8 @@ function generateWeek() {
 		date.setDate(startDate.getDate() + index);
 
 		week.push({
-			day: day,
-			date: date,
+			day,
+			date,
 		});
 	});
 

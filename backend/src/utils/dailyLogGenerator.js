@@ -3,6 +3,7 @@ const MurderSpot = require("../models/MurderSpot");
 const Camera = require("../models/Camera");
 const Location = require("../models/Location");
 
+// Determines the actual location and zone for an action.
 function getActionZone(action, resident, locations) {
 	const actualLocation = action.location === "Home" ? resident.house : action.location;
 
@@ -21,11 +22,10 @@ function getActionZone(action, resident, locations) {
 	};
 }
 
+// Generates all activity logs for one investigation day.
 async function generateDailyLogs(residents, gameDate, investigationDay) {
 	const murderSpots = await MurderSpot.find();
-
 	const cameras = await Camera.find();
-
 	const locations = await Location.find();
 
 	const logs = [];
@@ -36,6 +36,7 @@ async function generateDailyLogs(residents, gameDate, investigationDay) {
 
 	const day = dayNames[date.getDay()];
 
+	// Generate a routine for every resident and turn each action into a log.
 	for (const resident of residents) {
 		const routine = await generateDailyRoutine(resident, day, murderSpots, residents);
 
@@ -59,10 +60,12 @@ async function generateDailyLogs(residents, gameDate, investigationDay) {
 		}
 	}
 
+	// Sort all generated logs chronologically.
 	logs.sort((a, b) => {
 		return a.time.localeCompare(b.time);
 	});
 
 	return logs;
 }
+
 module.exports = generateDailyLogs;

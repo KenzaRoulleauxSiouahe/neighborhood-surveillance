@@ -3,6 +3,7 @@ const router = express.Router();
 
 const MurderSpot = require("../models/MurderSpot");
 
+// Get all murder spots stored in the database.
 router.get("/", async (req, res) => {
 	try {
 		const murders = await MurderSpot.find();

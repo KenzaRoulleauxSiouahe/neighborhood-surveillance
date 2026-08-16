@@ -6,6 +6,7 @@ const Log = require("../models/Log");
 const Game = require("../models/Game");
 const generateDailyLogs = require("../utils/dailyLogGenerator");
 
+// Generate and start the investigation logs for the current day.
 router.post("/generate", async (req, res) => {
 	try {
 		const game = await Game.findOne({
@@ -24,6 +25,7 @@ router.post("/generate", async (req, res) => {
 			time: 1,
 		});
 
+		// Generate and save the logs only if they do not already exist.
 		if (logs.length === 0) {
 			const residents = await Resident.find();
 
@@ -47,6 +49,7 @@ router.post("/generate", async (req, res) => {
 	}
 });
 
+// Move the investigation to the next day.
 router.post("/next-day", async (req, res) => {
 	try {
 		const game = await Game.findOne({
@@ -58,11 +61,13 @@ router.post("/next-day", async (req, res) => {
 				error: "No active game found.",
 			});
 		}
+
 		if (game.investigationRunning) {
 			return res.status(400).json({
 				error: "The current investigation is still running.",
 			});
 		}
+
 		if (game.investigationDay >= 4) {
 			return res.status(400).json({
 				error: "The final investigation day has already been completed.",
@@ -92,6 +97,8 @@ router.post("/next-day", async (req, res) => {
 		});
 	}
 });
+
+// Get the logs for the current investigation day.
 router.get("/logs", async (req, res) => {
 	try {
 		const game = await Game.findOne({
@@ -118,6 +125,7 @@ router.get("/logs", async (req, res) => {
 	}
 });
 
+// Get logs from investigation days that have already been completed.
 router.get("/archive", async (req, res) => {
 	try {
 		const game = await Game.findOne({
@@ -129,8 +137,10 @@ router.get("/archive", async (req, res) => {
 				error: "No active game found.",
 			});
 		}
+
 		let maxArchiveDay = game.investigationDay - 1;
 
+		// Once the current day is finished, include it in the archive.
 		if (!game.investigationRunning) {
 			maxArchiveDay = game.investigationDay;
 		}
@@ -153,4 +163,5 @@ router.get("/archive", async (req, res) => {
 		});
 	}
 });
+
 module.exports = router;

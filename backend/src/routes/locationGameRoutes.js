@@ -4,6 +4,7 @@ const router = express.Router();
 const generateLocation = require("../utils/locationGenerator");
 const Location = require("../models/Location");
 
+// Get all locations currently stored in the database.
 router.get("/", async (req, res) => {
 	try {
 		const locations = await Location.find();
@@ -16,6 +17,7 @@ router.get("/", async (req, res) => {
 	}
 });
 
+// Generate new placements for the locations of the current game.
 router.post("/generate", async (req, res) => {
 	try {
 		const locations = await generateLocation();

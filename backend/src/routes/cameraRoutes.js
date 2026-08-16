@@ -1,17 +1,23 @@
 const express = require("express");
 const router = express.Router();
+
 const Camera = require("../models/Camera");
 const Game = require("../models/Game");
 
+// Get all cameras.
 router.get("/", async (req, res) => {
 	try {
 		const cameras = await Camera.find();
+
 		res.status(200).json(cameras);
-	} catch (err) {
-		res.status(500).json({ error: err.message });
+	} catch (error) {
+		res.status(500).json({
+			error: error.message,
+		});
 	}
 });
 
+// Reset the current camera positions.
 router.patch("/reset", async (req, res) => {
 	try {
 		await Camera.updateMany(
@@ -31,6 +37,7 @@ router.patch("/reset", async (req, res) => {
 	}
 });
 
+// Update a camera's position and save its coverage history.
 router.patch("/:id/coverage", async (req, res) => {
 	try {
 		const camera = await Camera.findById(req.params.id);
@@ -43,7 +50,9 @@ router.patch("/:id/coverage", async (req, res) => {
 
 		const newZones = Array.isArray(req.body.coveredZones) ? req.body.coveredZones : [];
 
-		const game = await Game.findOne({ status: "active" });
+		const game = await Game.findOne({
+			status: "active",
+		});
 
 		if (!game) {
 			return res.status(400).json({
@@ -55,6 +64,7 @@ router.patch("/:id/coverage", async (req, res) => {
 
 		camera.coveredZones = newZones;
 
+		// Save the camera's position for the current investigation day.
 		if (newZone) {
 			const alreadyRecorded = camera.coverageHistory.some((entry) => entry.day === game.investigationDay);
 
@@ -72,13 +82,9 @@ router.patch("/:id/coverage", async (req, res) => {
 
 		await camera.save();
 
-		console.log("Camera coverage updated:", camera.name);
-		console.log("Current zone:", camera.coveredZones);
-		console.log("Coverage history:", camera.coverageHistory);
-
 		res.json(camera);
 	} catch (error) {
-		console.error("CAMERA COVERAGE ERROR:", error);
+		console.error("Camera coverage error:", error);
 
 		res.status(500).json({
 			error: error.message,

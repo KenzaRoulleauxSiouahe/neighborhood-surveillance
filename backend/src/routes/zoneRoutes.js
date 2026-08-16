@@ -3,15 +3,20 @@ const router = express.Router();
 
 const Zone = require("../models/Zone");
 
+// Get all zones stored in the database.
 router.get("/", async (req, res) => {
 	try {
 		const zones = await Zone.find();
+
 		res.status(200).json(zones);
 	} catch (error) {
-		res.status(500).json({ message: error.message });
+		res.status(500).json({
+			message: error.message,
+		});
 	}
 });
 
+// Reset and seed the 20 map zones.
 router.post("/seed", async (req, res) => {
 	try {
 		await Zone.deleteMany();
@@ -44,7 +49,9 @@ router.post("/seed", async (req, res) => {
 			zones: zones,
 		});
 	} catch (error) {
-		res.status(500).json({ message: error.message });
+		res.status(500).json({
+			message: error.message,
+		});
 	}
 });
 

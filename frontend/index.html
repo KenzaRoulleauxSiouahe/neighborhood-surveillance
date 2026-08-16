@@ -7,14 +7,16 @@
 
 		<link rel="stylesheet" href="style.css" />
 	</head>
+
 	<body>
+		<!-- Initial case briefing shown before the game starts. -->
 		<div id="briefing-screen">
 			<div id="briefing-content">
 				<p class="case-number">CASE FILE #001</p>
 				<h1>THE WALKING VILLAGE</h1>
 				<div class="briefing-divider"></div>
-				<p class="briefing-text">Three murders.</p>
 
+				<p class="briefing-text">Three murders.</p>
 				<p class="briefing-text">Each one happened exactly four days apart.</p>
 
 				<div class="victim-list">
@@ -59,6 +61,8 @@
 				<button id="begin-game-btn">BEGIN INVESTIGATION</button>
 			</div>
 		</div>
+
+		<!-- Main game title and information tooltip. -->
 		<div class="game-title">
 			<h1>NEIGHBOURHOOD SURVEILLANCE</h1>
 
@@ -69,8 +73,11 @@
 				?
 			</div>
 		</div>
+
 		<h2>Neighbourhood Map</h2>
+
 		<div id="game-container">
+			<!-- Camera selection, legend and information panels. -->
 			<div id="camera-selection">
 				<button class="camera-btn camera-green" data-camera="Camera 1">🎥 Camera 1</button>
 
@@ -79,23 +86,20 @@
 				<button class="camera-btn camera-yellow" data-camera="Camera 3">🎥 Camera 3</button>
 
 				<button class="camera-btn camera-red" data-camera="Camera 4">🎥 Camera 4</button>
+
 				<div id="legend">
 					<h3>Legend</h3>
 
 					<div>🏠 House</div>
-
 					<div>🌲 Forest</div>
-
 					<div>🏫 School</div>
-
 					<div>🛒 Shops</div>
-
 					<div>⚰️ Cemetery</div>
-
 					<div>👮🏻 Police Station</div>
-
 					<div>☠️ Murder Scenes</div>
 				</div>
+
+				<!-- Resident investigation files. -->
 				<button id="resident-files-btn">📁 Resident Files</button>
 
 				<div id="resident-file-overlay">
@@ -151,7 +155,10 @@
 						</div>
 					</div>
 				</div>
+
+				<!-- Archived investigation logs. -->
 				<button id="log-archive-btn">LOG ARCHIVE</button>
+
 				<div id="log-archive-overlay">
 					<div id="log-archive-content">
 						<button id="close-log-archive">✕</button>
@@ -166,8 +173,11 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- Main map and game actions. -->
 			<div id="game-area">
 				<div id="map">
+					<!-- Each zone contains its name, locations and murder-scene layers. -->
 					<div class="zone" data-zone="A1">
 						<span class="zone-name">A1</span>
 						<div class="location-layer"></div>
@@ -317,8 +327,11 @@
 						<div class="location-layer"></div>
 						<div class="murder-layer"></div>
 					</div>
+
+					<!-- Final accusation and new-game controls. -->
 					<div id="game-actions">
 						<button id="accusation-btn">⚖️ FINAL ACCUSATION</button>
+
 						<div id="accusation-overlay">
 							<div id="accusation-screen">
 								<button id="close-accusation" type="button">✕</button>
@@ -340,6 +353,7 @@
 								<button id="submit-accusation-btn">SUBMIT ACCUSATION</button>
 
 								<div id="accusation-result"></div>
+
 								<div id="result-actions">
 									<button id="result-new-game-btn" style="display: none">NEW GAME</button>
 
@@ -347,19 +361,25 @@
 								</div>
 							</div>
 						</div>
+
 						<button id="new-game-btn">New Game</button>
 					</div>
 				</div>
+
+				<!-- Final investigation report. -->
 				<div id="case-report-overlay" class="overlay">
 					<div class="case-report">
 						<button id="close-case-report" type="button">✕</button>
+
 						<div class="case-report-header">
 							<div class="file-stamp">FINISHED INVESTIGATION</div>
 							<h1>CASE REPORT</h1>
 							<p>FINAL INVESTIGATION SUMMARY</p>
 						</div>
-						<selection class="report-selection">
+
+						<section class="report-selection">
 							<h2>CASE OVERVIEW</h2>
+
 							<div class="overview-grid">
 								<div>
 									<span class="report-label">VICTIMS</span>
@@ -381,10 +401,10 @@
 									<strong id="report-days">0 / 4</strong>
 								</div>
 							</div>
-						</selection>
+						</section>
+
 						<section class="report-section">
 							<h2>CAMERA COVERAGE</h2>
-
 							<div id="report-camera-coverage" class="coverage-list"></div>
 						</section>
 
@@ -396,6 +416,7 @@
 								<span id="report-suspicious-events">0</span>
 							</div>
 						</section>
+
 						<section class="report-section">
 							<h2>INVESTIGATION SUMMARY</h2>
 
@@ -427,13 +448,16 @@
 				</div>
 			</div>
 
+			<!-- Investigation controls and camera logs. -->
 			<div id="camera-panel">
 				<button id="next-day-btn" disabled>START NEXT DAY</button>
 				<button id="start-investigation-btn" disabled>START INVESTIGATION</button>
+
 				<div id="game-clock">
 					<div id="investigation-day">INVESTIGATION DAY 1</div>
 					<div id="game-time">00:00:00</div>
 				</div>
+
 				<div id="camera-logs">
 					<h3>Camera Logs</h3>
 

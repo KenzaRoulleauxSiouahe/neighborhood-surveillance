@@ -17,5 +17,13 @@ services:
     depends_on:
       - mongodb
 
+  frontend:
+    build: ./frontend
+    container_name: neighbourhood-surveillance-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
 volumes:
   mongodb_data:

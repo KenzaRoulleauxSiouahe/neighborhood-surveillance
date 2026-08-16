@@ -1,19 +1,37 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config({ path: "../.env" });
 
-const Resident = require("./src/models/Resident");
 const residentRoutes = require("./src/routes/residentRoutes");
+const locationRoutes = require("./src/routes/locationRoutes");
+const cameraRoutes = require("./src/routes/cameraRoutes");
+const gameRoutes = require("./src/routes/gameRoutes");
+const locationGameRoutes = require("./src/routes/locationGameRoutes.js");
+const zoneRoutes = require("./src/routes/zoneRoutes");
+const actionRoutes = require("./src/routes/actionRoutes");
+const murderSpotRoutes = require("./src/routes/murderSpotRoutes");
 
 const app = express();
 
-const port = process.env.PORT || 5000;
-
+app.use(cors());
 app.use(express.json());
 
-app.use("/api/residents", residentRoutes);
+const port = process.env.PORT || 5000;
 
+// API routes
+app.use("/api/residents", residentRoutes);
+app.use("/api/locations", locationRoutes);
+app.use("/api/cameras", cameraRoutes);
+app.use("/api/game", gameRoutes);
+app.use("/api/location-game", locationGameRoutes);
+app.use("/api/zones", zoneRoutes);
+app.use("/api/actions", actionRoutes);
+app.use("/api/murder-spots", murderSpotRoutes);
+
+// Connect to MongoDB
 mongoose
-	.connect("mongodb://localhost:27017/neighbourhood-surveillance")
+	.connect(process.env.MONGO_URI)
 	.then(() => {
 		console.log("Connected to MongoDB");
 	})
@@ -21,25 +39,9 @@ mongoose
 		console.error("Error connecting to MongoDB:", err);
 	});
 
+// Basic server health check
 app.get("/", (req, res) => {
 	res.send("neighbourhood Surveillance is running!");
-});
-
-app.get("/test-resident", async (req, res) => {
-	try {
-		const resident = new Resident({
-			name: "Mr Smith",
-			house: "A3",
-			age: 30,
-			role: "Plumber",
-			isCultMember: true,
-		});
-		await resident.save();
-
-		res.status(201).json(resident);
-	} catch (err) {
-		res.status(500).json({ error: err.message });
-	}
 });
 
 app.listen(port, () => {

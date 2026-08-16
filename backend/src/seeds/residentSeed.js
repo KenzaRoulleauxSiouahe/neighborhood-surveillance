@@ -1,84 +1,92 @@
+require("dotenv").config();
+
 const mongoose = require("mongoose");
 const Resident = require("../models/Resident");
 
+// Initial resident data used to populate the database.
 const residents = [
-    {
-        name: "Rick Grimes",
-        house: "A3",
-        age: 30,
-        role: "Teacher"
-    },
-    {
-        name: "Maggie Greene",
-        house: "B1",
-        age: 55,
-        role: "Shop owner"
-    },
-    {
-        name: "Daryl Dixon",
-        house: "C2",
-        age: 42,
-        role: "Doctor"
-    },
-    {
-        name: "Michonne Wilson",
-        house: "D4",
-        age: 28,
-        role: "Nurse"
-    },
-    {
-        name: "Carol Peletier",
-        house: "E1",
-        age: 65,
-        role: "Retired"
-    },
-    {
-        name: "Rosita Espinosa",
-        house: "F3",
-        age: 35,
-        role: "Lawyer"
-    },
-    {
-        name: "Glenn Rhee",
-        house: "G2",
-        age: 48,
-        role: "Mechanic"
-    },
-    {
-        name: "Sasha Williams",
-        house: "H1",
-        age: 25,
-        role: "Student"
-    },
-    {
-        name: "Bob Stookey",
-        house: "I4",
-        age: 50,
-        role: "Engineer"
-    },
-    {
-        name: "Beth Jones",
-        house: "J3",
-        age: 39,
-        role: "Artist"
-    }
+	{
+		name: "Rick Grimes",
+		house: "Michonne and Rick's House",
+		age: 42,
+		role: "Police Officer",
+	},
+	{
+		name: "Maggie Greene",
+		house: "Maggie and Glenn's House",
+		age: 27,
+		role: "Shop Owner",
+	},
+	{
+		name: "Daryl Dixon",
+		house: "Daryl's House",
+		age: 42,
+		role: "Doctor",
+	},
+	{
+		name: "Michonne Wilson",
+		house: "Michonne and Rick's House",
+		age: 40,
+		role: "Artist",
+	},
+	{
+		name: "Carol Peletier",
+		house: "Carol's House",
+		age: 55,
+		role: "Retired",
+	},
+	{
+		name: "Rosita Espinosa",
+		house: "Rosita's House",
+		age: 35,
+		role: "Teacher",
+	},
+	{
+		name: "Glenn Rhee",
+		house: "Maggie and Glenn's House",
+		age: 27,
+		role: "Forest Keeper",
+	},
+	{
+		name: "Sasha Williams",
+		house: "Sasha's House",
+		age: 39,
+		role: "Teacher",
+	},
+	{
+		name: "Bob Stookey",
+		house: "Bob's House",
+		age: 40,
+		role: "Cashier",
+	},
+	{
+		name: "Beth Jones",
+		house: "Beth's House",
+		age: 25,
+		role: "Student",
+	},
+	{
+		name: "Eziekiel King",
+		house: "Eziekiel's House",
+		age: 55,
+		role: "Grave Keeper",
+	},
 ];
 
 async function seedResidents() {
-    try {
-        await mongoose.connect("mongodb://localhost:27017/neighbourhood-surveillance");
+	try {
+		await mongoose.connect(process.env.MONGO_URI);
 
-        await Resident.deleteMany();
+		// Replace existing residents with the seed data.
+		await Resident.deleteMany();
+		await Resident.insertMany(residents);
 
-        await Resident.insertMany(residents);
-
-        console.log("Residents added!");
-
-        mongoose.disconnect();
-
-    } catch(error) {
-        console.error(error);
-    }
+		console.log("Residents added!");
+	} catch (error) {
+		console.error("Error seeding residents:", error);
+	} finally {
+		await mongoose.connection.close();
+	}
 }
 
 seedResidents();

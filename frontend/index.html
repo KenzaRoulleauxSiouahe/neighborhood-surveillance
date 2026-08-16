@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Neighbourhood Surveillance</title>
+
+		<link rel="stylesheet" href="style.css" />
+	</head>
+
+	<body>
+		<!-- Initial case briefing shown before the game starts. -->
+		<div id="briefing-screen">
+			<div id="briefing-content">
+				<p class="case-number">CASE FILE #001</p>
+				<h1>THE WALKING VILLAGE</h1>
+				<div class="briefing-divider"></div>
+
+				<p class="briefing-text">Three murders.</p>
+				<p class="briefing-text">Each one happened exactly four days apart.</p>
+
+				<div class="victim-list">
+					<div class="victim">
+						<p class="victim-number">VICTIM #01</p>
+						<p class="victim-name" id="victim-1-name">---</p>
+						<p class="victim-date" id="victim-1-date">---</p>
+					</div>
+
+					<div class="victim">
+						<p class="victim-number">VICTIM #02</p>
+						<p class="victim-name" id="victim-2-name">---</p>
+						<p class="victim-date" id="victim-2-date">---</p>
+					</div>
+
+					<div class="victim">
+						<p class="victim-number">VICTIM #03</p>
+						<p class="victim-name" id="victim-3-name">---</p>
+						<p class="victim-date" id="victim-3-date">---</p>
+					</div>
+				</div>
+
+				<p class="briefing-description">The pattern is clear.</p>
+
+				<p class="briefing-description">The crime scenes show signs of a cult ritual, but the identity of the people responsible remains unknown.</p>
+
+				<p class="briefing-description">You are the detective assigned to the case.</p>
+
+				<p class="briefing-warning">
+					The last murder happened four days ago.
+					<br />
+					You have <strong>four days</strong> to uncover the cult's members before another resident becomes their next victim.
+				</p>
+
+				<p class="briefing-description">
+					Place your cameras.<br />
+					Study the residents.<br />
+					Follow their movements.<br />
+					Find the cult before they strike again.
+				</p>
+
+				<button id="begin-game-btn">BEGIN INVESTIGATION</button>
+			</div>
+		</div>
+
+		<!-- Main game title and information tooltip. -->
+		<div class="game-title">
+			<h1>NEIGHBOURHOOD SURVEILLANCE</h1>
+
+			<div
+				class="game-info"
+				title="Your goal is to identify the members of the cult responsible for the murders in the neighbourhood. Use the cameras to observe the residents, study their movements and activity logs, and gather enough evidence to make your final accusation."
+			>
+				?
+			</div>
+		</div>
+
+		<h2>Neighbourhood Map</h2>
+
+		<div id="game-container">
+			<!-- Camera selection, legend and information panels. -->
+			<div id="camera-selection">
+				<button class="camera-btn camera-green" data-camera="Camera 1">🎥 Camera 1</button>
+
+				<button class="camera-btn camera-blue" data-camera="Camera 2">🎥 Camera 2</button>
+
+				<button class="camera-btn camera-yellow" data-camera="Camera 3">🎥 Camera 3</button>
+
+				<button class="camera-btn camera-red" data-camera="Camera 4">🎥 Camera 4</button>
+
+				<div id="legend">
+					<h3>Legend</h3>
+
+					<div>🏠 House</div>
+					<div>🌲 Forest</div>
+					<div>🏫 School</div>
+					<div>🛒 Shops</div>
+					<div>⚰️ Cemetery</div>
+					<div>👮🏻 Police Station</div>
+					<div>☠️ Murder Scenes</div>
+				</div>
+
+				<!-- Resident investigation files. -->
+				<button id="resident-files-btn">📁 Resident Files</button>
+
+				<div id="resident-file-overlay">
+					<div id="resident-file">
+						<button id="close-resident-file">✕</button>
+
+						<div class="file-header">
+							<div class="file-label">CONFIDENTIAL</div>
+							<h2>THE WALKING VILLAGE</h2>
+							<p>RESIDENT INVESTIGATION FILES</p>
+						</div>
+
+						<div class="file-content">
+							<div id="resident-tabs"></div>
+
+							<div id="resident-page">
+								<div class="file-stamp">UNDER INVESTIGATION</div>
+
+								<h1 id="resident-name">Select a resident</h1>
+
+								<div class="resident-info">
+									<div class="info-row">
+										<span>Name</span>
+										<strong id="resident-name-info">—</strong>
+									</div>
+
+									<div class="info-row">
+										<span>Age</span>
+										<strong id="resident-age">—</strong>
+									</div>
+
+									<div class="info-row">
+										<span>Occupation</span>
+										<strong id="resident-role">—</strong>
+									</div>
+
+									<div class="info-row">
+										<span>Lives</span>
+										<strong id="resident-house">—</strong>
+									</div>
+
+									<div class="info-row">
+										<span>Working Hours</span>
+										<strong id="resident-working-hours">—</strong>
+									</div>
+
+									<div class="info-row">
+										<span>Days Off</span>
+										<strong id="resident-days-off">—</strong>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Archived investigation logs. -->
+				<button id="log-archive-btn">LOG ARCHIVE</button>
+
+				<div id="log-archive-overlay">
+					<div id="log-archive-content">
+						<button id="close-log-archive">✕</button>
+
+						<h2>LOG ARCHIVE</h2>
+
+						<div id="log-archive-days"></div>
+
+						<div id="archived-logs">
+							<p>Select an investigation day.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Main map and game actions. -->
+			<div id="game-area">
+				<div id="map">
+					<!-- Each zone contains its name, locations and murder-scene layers. -->
+					<div class="zone" data-zone="A1">
+						<span class="zone-name">A1</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="A2">
+						<span class="zone-name">A2</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="A3">
+						<span class="zone-name">A3</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="A4">
+						<span class="zone-name">A4</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="A5">
+						<span class="zone-name">A5</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="B1">
+						<span class="zone-name">B1</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="B2">
+						<span class="zone-name">B2</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="B3">
+						<span class="zone-name">B3</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="B4">
+						<span class="zone-name">B4</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="B5">
+						<span class="zone-name">B5</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="C1">
+						<span class="zone-name">C1</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="C2">
+						<span class="zone-name">C2</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="C3">
+						<span class="zone-name">C3</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="C4">
+						<span class="zone-name">C4</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="C5">
+						<span class="zone-name">C5</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="D1">
+						<span class="zone-name">D1</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="D2">
+						<span class="zone-name">D2</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="D3">
+						<span class="zone-name">D3</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="D4">
+						<span class="zone-name">D4</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="D5">
+						<span class="zone-name">D5</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="E1">
+						<span class="zone-name">E1</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="E2">
+						<span class="zone-name">E2</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="E3">
+						<span class="zone-name">E3</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="E4">
+						<span class="zone-name">E4</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<div class="zone" data-zone="E5">
+						<span class="zone-name">E5</span>
+						<div class="location-layer"></div>
+						<div class="murder-layer"></div>
+					</div>
+
+					<!-- Final accusation and new-game controls. -->
+					<div id="game-actions">
+						<button id="accusation-btn">⚖️ FINAL ACCUSATION</button>
+
+						<div id="accusation-overlay">
+							<div id="accusation-screen">
+								<button id="close-accusation" type="button">✕</button>
+
+								<h1>FINAL ACCUSATION</h1>
+
+								<div class="briefing-divider"></div>
+
+								<p class="accusation-description">All available surveillance evidence has been collected.</p>
+
+								<p class="accusation-description">Review the resident files and archived logs carefully.</p>
+
+								<h2>Who do you believe is a member of the cult?</h2>
+
+								<p class="accusation-instruction">Select all residents you believe are cult members.</p>
+
+								<div id="accusation-residents"></div>
+
+								<button id="submit-accusation-btn">SUBMIT ACCUSATION</button>
+
+								<div id="accusation-result"></div>
+
+								<div id="result-actions">
+									<button id="result-new-game-btn" style="display: none">NEW GAME</button>
+
+									<button id="case-report-btn" style="display: none">📋 VIEW CASE REPORT</button>
+								</div>
+							</div>
+						</div>
+
+						<button id="new-game-btn">New Game</button>
+					</div>
+				</div>
+
+				<!-- Final investigation report. -->
+				<div id="case-report-overlay" class="overlay">
+					<div class="case-report">
+						<button id="close-case-report" type="button">✕</button>
+
+						<div class="case-report-header">
+							<div class="file-stamp">FINISHED INVESTIGATION</div>
+							<h1>CASE REPORT</h1>
+							<p>FINAL INVESTIGATION SUMMARY</p>
+						</div>
+
+						<section class="report-selection">
+							<h2>CASE OVERVIEW</h2>
+
+							<div class="overview-grid">
+								<div>
+									<span class="report-label">VICTIMS</span>
+									<strong id="report-victims">0</strong>
+								</div>
+
+								<div>
+									<span class="report-label">RESIDENTS</span>
+									<strong id="report-residents">0</strong>
+								</div>
+
+								<div>
+									<span class="report-label">CAMERAS</span>
+									<strong id="report-cameras">0</strong>
+								</div>
+
+								<div>
+									<span class="report-label">INVESTIGATION</span>
+									<strong id="report-days">0 / 4</strong>
+								</div>
+							</div>
+						</section>
+
+						<section class="report-section">
+							<h2>CAMERA COVERAGE</h2>
+							<div id="report-camera-coverage" class="coverage-list"></div>
+						</section>
+
+						<section class="report-section">
+							<h2>SUSPICIOUS EVENTS</h2>
+
+							<div class="event-visual">
+								<div id="suspicious-event-bar"></div>
+								<span id="report-suspicious-events">0</span>
+							</div>
+						</section>
+
+						<section class="report-section">
+							<h2>INVESTIGATION SUMMARY</h2>
+
+							<div class="summary-list">
+								<p>
+									<span>Days investigated</span>
+									<strong id="summary-days">0</strong>
+								</p>
+
+								<p>
+									<span>Camera observations</span>
+									<strong id="summary-observations">0</strong>
+								</p>
+
+								<p>
+									<span>Suspicious events</span>
+									<strong id="summary-events">0</strong>
+								</p>
+
+								<p>
+									<span>Residents investigated</span>
+									<strong id="summary-residents">0</strong>
+								</p>
+							</div>
+						</section>
+
+						<div class="case-result-stamp" id="case-result-stamp">CASE CLOSED</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Investigation controls and camera logs. -->
+			<div id="camera-panel">
+				<button id="next-day-btn" disabled>START NEXT DAY</button>
+				<button id="start-investigation-btn" disabled>START INVESTIGATION</button>
+
+				<div id="game-clock">
+					<div id="investigation-day">INVESTIGATION DAY 1</div>
+					<div id="game-time">00:00:00</div>
+				</div>
+
+				<div id="camera-logs">
+					<h3>Camera Logs</h3>
+
+					<div id="logs">
+						<p>No activity yet...</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="script.js"></script>
+	</body>
+</html>

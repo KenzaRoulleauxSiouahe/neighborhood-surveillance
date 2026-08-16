@@ -1299,28 +1299,41 @@ async function generateCaseReport() {
 		coverageContainer.innerHTML = "";
 
 		cameras.forEach((camera) => {
-			const coveredZones = camera.coverageHistory || [];
-
-			const percentage = Math.min((coveredZones.length / 4) * 100, 100);
+			const history = camera.coverageHistory || [];
 
 			const row = document.createElement("div");
+			row.className = "camera-history-item";
 
-			row.className = "coverage-row";
+			const cameraName = document.createElement("div");
+			cameraName.className = "camera-history-name";
+			cameraName.textContent = camera.name;
 
-			row.innerHTML = `
-				<span class="coverage-zone">
-					${camera.name}
-				</span>
+			const historyBar = document.createElement("div");
+			historyBar.className = "camera-history-bar";
 
-				<div
-					class="coverage-bar"
-					style="--coverage: ${Math.max(percentage, 5)}%"
-				></div>
+			for (let day = 1; day <= 4; day++) {
+				const dayEntry = history.find((entry) => entry.day === day);
 
-				<span class="coverage-number">
-					${coveredZones.length} zones
-				</span>
-			`;
+				const dayElement = document.createElement("div");
+				dayElement.className = "camera-history-day";
+
+				const dayNumber = document.createElement("span");
+				dayNumber.className = "camera-history-day-number";
+				dayNumber.textContent = `DAY ${day}`;
+
+				dayElement.appendChild(dayNumber);
+
+				if (dayEntry) {
+					dayElement.setAttribute("data-zone", `Investigation Day ${day}: ${dayEntry.zone}`);
+				} else {
+					dayElement.classList.add("empty");
+				}
+
+				historyBar.appendChild(dayElement);
+			}
+
+			row.appendChild(cameraName);
+			row.appendChild(historyBar);
 
 			coverageContainer.appendChild(row);
 		});

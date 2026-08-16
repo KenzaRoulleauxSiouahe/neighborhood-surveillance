@@ -17,7 +17,12 @@ const cameraSchema = new mongoose.Schema({
 	},
 
 	coverageHistory: {
-		type: [String],
+		type: [
+			{
+				day: Number,
+				zone: String,
+			},
+		],
 		default: [],
 	},
 });

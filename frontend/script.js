@@ -349,6 +349,7 @@ async function updateCameraCoverage(cameraId, coveredZones) {
 			},
 			body: JSON.stringify({
 				coveredZones: coveredZones,
+				playerId: playerId,
 			}),
 		});
 

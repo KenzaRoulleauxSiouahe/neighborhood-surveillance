@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Camera = require("../models/Camera");
+const Game = require("../models/Game");
 
 router.get("/", async (req, res) => {
 	try {
@@ -40,20 +41,45 @@ router.patch("/:id/coverage", async (req, res) => {
 			});
 		}
 
-		const newZones = req.body.coveredZones || [];
+		const newZones = Array.isArray(req.body.coveredZones) ? req.body.coveredZones : [];
+
+		const game = await Game.findOne({ status: "active" });
+
+		if (!game) {
+			return res.status(400).json({
+				error: "No active game found.",
+			});
+		}
+
+		const newZone = newZones[0];
 
 		camera.coveredZones = newZones;
 
-		newZones.forEach((zone) => {
-			if (!camera.coverageHistory.includes(zone)) {
-				camera.coverageHistory.push(zone);
+		if (newZone) {
+			const alreadyRecorded = camera.coverageHistory.some((entry) => entry.day === game.investigationDay);
+
+			if (!alreadyRecorded) {
+				camera.coverageHistory.push({
+					day: game.investigationDay,
+					zone: newZone,
+				});
+			} else {
+				const existingEntry = camera.coverageHistory.find((entry) => entry.day === game.investigationDay);
+
+				existingEntry.zone = newZone;
 			}
-		});
+		}
 
 		await camera.save();
 
+		console.log("Camera coverage updated:", camera.name);
+		console.log("Current zone:", camera.coveredZones);
+		console.log("Coverage history:", camera.coverageHistory);
+
 		res.json(camera);
 	} catch (error) {
+		console.error("CAMERA COVERAGE ERROR:", error);
+
 		res.status(500).json({
 			error: error.message,
 		});

@@ -13,6 +13,7 @@ let selectedAccusations = [];
 let playerId = localStorage.getItem("playerId");
 
 const API_URL = "http://localhost:5000/api";
+
 const cameraColors = {
 	"Camera 1": "green",
 	"Camera 2": "blue",
@@ -20,42 +21,55 @@ const cameraColors = {
 	"Camera 4": "red",
 };
 
+// Main interface elements
 const briefingScreen = document.getElementById("briefing-screen");
 const beginGameButton = document.getElementById("begin-game-btn");
 const cameras = document.querySelectorAll(".camera-btn");
-const cameraButtons = document.querySelectorAll(".camera-btn");
 const newGameButton = document.getElementById("new-game-btn");
 const zones = document.querySelectorAll(".zone");
+
 const residentFilesButton = document.getElementById("resident-files-btn");
 const residentFileOverlay = document.getElementById("resident-file-overlay");
 const closeResidentFileButton = document.getElementById("close-resident-file");
+
 const logArchiveButton = document.getElementById("log-archive-btn");
 const logArchiveOverlay = document.getElementById("log-archive-overlay");
 const closeLogArchiveButton = document.getElementById("close-log-archive");
 const logArchiveDays = document.getElementById("log-archive-days");
 const archivedLogs = document.getElementById("archived-logs");
+
 const residentTabs = document.getElementById("resident-tabs");
+
 const startInvestigationButton = document.getElementById("start-investigation-btn");
 const nextDayButton = document.getElementById("next-day-btn");
-const GAME_MINUTES_PER_REAL_SECOND = 40;
+
 const accusationButton = document.getElementById("accusation-btn");
-accusationButton.disabled = true;
 const accusationOverlay = document.getElementById("accusation-overlay");
 const closeAccusationBtn = document.getElementById("close-accusation");
 const accusationResidents = document.getElementById("accusation-residents");
 const submitAccusationButton = document.getElementById("submit-accusation-btn");
 const accusationResult = document.getElementById("accusation-result");
 const resultNewGameButton = document.getElementById("result-new-game-btn");
+
 const caseReportButton = document.getElementById("case-report-btn");
 const caseReportOverlay = document.getElementById("case-report-overlay");
 const closeCaseReportButton = document.getElementById("close-case-report");
 
+const GAME_MINUTES_PER_REAL_SECOND = 40;
+
+accusationButton.disabled = true;
+
+// Create a player ID if this is the first game on this browser.
 if (!playerId) {
 	playerId = crypto.randomUUID();
 	localStorage.setItem("playerId", playerId);
 }
 
 console.log("Player ID:", playerId);
+
+/* -------------------------
+   BRIEFING
+------------------------- */
 
 async function loadBriefingVictims() {
 	try {
@@ -68,7 +82,6 @@ async function loadBriefingVictims() {
 			const victimNumber = index + 1;
 
 			const nameElement = document.getElementById(`victim-${victimNumber}-name`);
-
 			const dateElement = document.getElementById(`victim-${victimNumber}-date`);
 
 			if (nameElement && dateElement) {
@@ -100,6 +113,11 @@ function hideBriefing() {
 beginGameButton.addEventListener("click", () => {
 	hideBriefing();
 });
+
+/* -------------------------
+   CAMERAS
+------------------------- */
+
 async function loadCameras() {
 	try {
 		document.querySelectorAll(".zone").forEach((zone) => {
@@ -111,6 +129,7 @@ async function loadCameras() {
 
 		const response = await fetch(`${API_URL}/cameras`);
 		const cameras = await response.json();
+
 		camerasData = cameras;
 
 		cameras.forEach((camera) => {
@@ -126,20 +145,23 @@ async function loadCameras() {
 			});
 		});
 
-		console.log("Loaded cameras:", camerasData);
 		updateStartInvestigationButton();
 	} catch (error) {
 		console.error("Error loading cameras:", error);
 	}
 }
 
+/* -------------------------
+   LOCATIONS
+------------------------- */
+
 async function loadLocations() {
 	try {
 		const response = await fetch(`${API_URL}/locations`);
 		const locations = await response.json();
+
 		locationsData = locations;
 
-		console.log("Loaded locations:", locationsData);
 		displayLocations();
 	} catch (error) {
 		console.error("Error loading locations:", error);
@@ -149,10 +171,7 @@ async function loadLocations() {
 async function loadMurderSpots() {
 	try {
 		const response = await fetch(`${API_URL}/murder-spots`);
-
 		const murders = await response.json();
-
-		console.log("Loaded murder spots:", murders);
 
 		murders.forEach((murder) => {
 			const zoneElement = document.querySelector(`[data-zone="${murder.zone}"]`);
@@ -163,9 +182,7 @@ async function loadMurderSpots() {
 				const skull = document.createElement("div");
 
 				skull.classList.add("murder-icon");
-
 				skull.textContent = "☠️";
-
 				skull.setAttribute("title", `Murder scene - Victim: ${murder.victim}`);
 
 				murderLayer.appendChild(skull);
@@ -176,6 +193,7 @@ async function loadMurderSpots() {
 	}
 }
 
+// Load the existing map data when the page opens.
 loadCameras();
 loadLocations();
 loadMurderSpots();
@@ -184,6 +202,62 @@ loadBriefingVictims();
 if (sessionStorage.getItem("briefingSeen") === "true") {
 	hideBriefing();
 }
+
+//Locations are added directly to their corresponding map zones.
+
+function displayLocations() {
+	const layer = document.getElementById("location-layer");
+
+	locationsData.forEach((location) => {
+		const icon = document.createElement("div");
+
+		icon.classList.add("location-icon");
+
+		if (location.type === "forest") {
+			icon.classList.add("forest-icon");
+
+			icon.innerHTML = `
+				<span>🌲</span>
+				<span>🌲</span>
+				<span>🌲</span>
+			`;
+
+			icon.title = location.name;
+		} else {
+			icon.textContent = getLocationIcon(location.type);
+			icon.title = location.name;
+		}
+
+		const zoneElement = document.querySelector(`[data-zone="${location.zone}"]`);
+
+		if (zoneElement) {
+			zoneElement.appendChild(icon);
+		}
+	});
+}
+
+function getLocationIcon(type) {
+	switch (type) {
+		case "forest":
+			return "🌲";
+		case "police":
+			return "👮🏻";
+		case "cemetery":
+			return "⚰️";
+		case "school":
+			return "🏫";
+		case "shop":
+			return "🛒";
+		case "house":
+			return "🏠";
+		default:
+			return "📍";
+	}
+}
+
+/* -------------------------
+   NEW GAME
+------------------------- */
 
 async function newGame() {
 	try {
@@ -215,8 +289,6 @@ async function newGame() {
 		}
 
 		startInvestigationButton.disabled = true;
-
-		console.log("PLAYER ID BEFORE START:", playerId);
 
 		const gameResponse = await fetch(`${API_URL}/game/start`, {
 			method: "POST",
@@ -258,6 +330,7 @@ async function newGame() {
 		document.querySelectorAll(".location-icon").forEach((icon) => {
 			icon.remove();
 		});
+
 		displayLocations();
 
 		document.querySelectorAll(".murder-icon").forEach((icon) => {
@@ -266,6 +339,7 @@ async function newGame() {
 
 		await loadMurderSpots();
 		await loadBriefingVictims();
+
 		showBriefing();
 		sessionStorage.removeItem("briefingSeen");
 	} catch (error) {
@@ -273,73 +347,18 @@ async function newGame() {
 	}
 }
 
-function displayLocations() {
-	const layer = document.getElementById("location-layer");
+newGameButton.addEventListener("click", () => {
+	const confirmNewGame = confirm("Are you sure you want to start a new game? This will reset all camera placements and generate new locations.");
 
-	locationsData.forEach((location) => {
-		const icon = document.createElement("div");
-
-		icon.classList.add("location-icon");
-
-		if (location.type === "forest") {
-			icon.classList.add("forest-icon");
-
-			icon.innerHTML = `
-				<span>🌲</span>
-				<span>🌲</span>
-				<span>🌲</span>
-			`;
-			icon.title = location.name;
-		} else {
-			icon.textContent = getLocationIcon(location.type);
-
-			icon.title = location.name;
-		}
-
-		const zoneElement = document.querySelector(`[data-zone="${location.zone}"]`);
-
-		if (zoneElement) {
-			zoneElement.appendChild(icon);
-		}
-	});
-}
-
-function getZonePosition(zone) {
-	const zoneElement = document.querySelector(`[data-zone="${zone}"]`);
-
-	if (!zoneElement) {
-		console.error("Zone not found:", zone);
-		return { x: 0, y: 0 };
+	if (confirmNewGame) {
+		newGame();
 	}
+});
 
-	const map = document.getElementById("map");
+/* -------------------------
+   CAMERA PLACEMENT
+------------------------- */
 
-	const zoneRect = zoneElement.getBoundingClientRect();
-	const mapRect = map.getBoundingClientRect();
-
-	return {
-		x: ((zoneRect.left - mapRect.left + zoneRect.width / 2) / mapRect.width) * 100,
-		y: ((zoneRect.top - mapRect.top + zoneRect.height / 2) / mapRect.height) * 100,
-	};
-}
-function getLocationIcon(type) {
-	switch (type) {
-		case "forest":
-			return "🌲";
-		case "police":
-			return "👮🏻";
-		case "cemetery":
-			return "⚰️";
-		case "school":
-			return "🏫";
-		case "shop":
-			return "🛒";
-		case "house":
-			return "🏠";
-		default:
-			return "📍";
-	}
-}
 async function updateCameraCoverage(cameraId, coveredZones) {
 	try {
 		const response = await fetch(`${API_URL}/cameras/${cameraId}/coverage`, {
@@ -353,9 +372,7 @@ async function updateCameraCoverage(cameraId, coveredZones) {
 			}),
 		});
 
-		const updatedCamera = await response.json();
-
-		console.log("Updated camera:", updatedCamera);
+		await response.json();
 	} catch (error) {
 		console.error("Error updating camera coverage:", error);
 	}
@@ -367,8 +384,6 @@ cameras.forEach((button) => {
 
 		selectedCamera = camerasData.find((camera) => camera.name === cameraName);
 
-		console.log("Selected camera:", selectedCamera);
-
 		cameras.forEach((cam) => {
 			cam.classList.remove("selected");
 		});
@@ -376,27 +391,18 @@ cameras.forEach((button) => {
 		button.classList.add("selected");
 	});
 });
-newGameButton.addEventListener("click", () => {
-	const confirmNewGame = confirm("Are you sure you want to start a new game? This will reset all camera placements and generate new locations.");
-
-	if (confirmNewGame) {
-		newGame();
-	}
-});
 
 zones.forEach((zone) => {
 	zone.addEventListener("click", async () => {
 		if (investigationRunning) {
-			console.log("You cannot move cameras during an investigation.");
 			return;
 		}
+
 		if (selectedCamera === null) {
-			console.log("Please select a camera first.");
 			return;
 		}
 
 		const zoneName = zone.dataset.zone;
-
 		const oldZone = cameraCoverage[selectedCamera.name];
 
 		if (oldZone === zoneName) {
@@ -420,6 +426,7 @@ zones.forEach((zone) => {
 
 			delete cameraCoverage[otherCamera];
 			delete zoneCameras[zoneName];
+
 			otherCameraData.coveredZones = [];
 
 			await updateCameraCoverage(otherCameraData._id, []);
@@ -443,8 +450,6 @@ zones.forEach((zone) => {
 		selectedCamera.coveredZones = [zoneName];
 
 		await updateCameraCoverage(selectedCamera._id, selectedCamera.coveredZones);
-
-		console.log(selectedCamera.name, "is placed at", zoneName);
 	});
 });
 
@@ -456,6 +461,11 @@ function updateStartInvestigationButton() {
 
 	startInvestigationButton.disabled = false;
 }
+
+/* -------------------------
+   RESIDENT FILES
+------------------------- */
+
 residentFilesButton.addEventListener("click", async () => {
 	residentFileOverlay.style.display = "flex";
 
@@ -472,8 +482,6 @@ async function loadResidents() {
 
 		residentsData = await response.json();
 
-		console.log("Loaded residents:", residentsData);
-
 		displayResidentTabs();
 
 		if (residentsData.length > 0) {
@@ -483,6 +491,7 @@ async function loadResidents() {
 		console.error("Error loading residents:", error);
 	}
 }
+
 function displayResidentTabs() {
 	residentTabs.innerHTML = "";
 
@@ -490,7 +499,6 @@ function displayResidentTabs() {
 		const tab = document.createElement("button");
 
 		tab.classList.add("resident-tab");
-
 		tab.textContent = resident.name;
 
 		tab.addEventListener("click", () => {
@@ -510,13 +518,11 @@ function displayResidentTabs() {
 		}
 	});
 }
+
 function displayResident(resident) {
 	document.getElementById("resident-name").textContent = resident.name;
-
 	document.getElementById("resident-name-info").textContent = resident.name;
-
 	document.getElementById("resident-age").textContent = resident.age;
-
 	document.getElementById("resident-role").textContent = resident.role;
 
 	document.getElementById("resident-house").textContent = getResidentLocation(resident.house);
@@ -535,6 +541,10 @@ function getResidentLocation(houseName) {
 
 	return `${location.name} — ${location.zone}`;
 }
+
+/* -------------------------
+   LOG ARCHIVE
+------------------------- */
 
 logArchiveButton.addEventListener("click", async () => {
 	logArchiveOverlay.style.display = "flex";
@@ -555,8 +565,6 @@ async function loadLogArchive() {
 		}
 
 		const logs = await response.json();
-
-		console.log("Archived logs:", logs);
 
 		const days = [...new Set(logs.map((log) => log.investigationDay))].sort((a, b) => a - b);
 
@@ -593,7 +601,6 @@ function displayArchivedLogs(logs, day) {
 
 	dayLogs.forEach((log) => {
 		const logEntry = document.createElement("div");
-
 		logEntry.classList.add("log-entry");
 
 		const cameraSpan = document.createElement("span");
@@ -615,6 +622,7 @@ function displayArchivedLogs(logs, day) {
 		archivedLogs.appendChild(logEntry);
 	});
 }
+
 function displayInvestigationLog(log) {
 	const logsContainer = document.getElementById("logs");
 
@@ -623,7 +631,6 @@ function displayInvestigationLog(log) {
 	}
 
 	const logEntry = document.createElement("div");
-
 	logEntry.classList.add("log-entry");
 
 	const cameraSpan = document.createElement("span");
@@ -643,9 +650,12 @@ function displayInvestigationLog(log) {
 	}
 
 	logsContainer.appendChild(logEntry);
-
 	logsContainer.scrollTop = logsContainer.scrollHeight;
 }
+
+/* -------------------------
+   INVESTIGATION
+------------------------- */
 
 startInvestigationButton.addEventListener("click", async () => {
 	if (investigationRunning) {
@@ -670,14 +680,10 @@ startInvestigationButton.addEventListener("click", async () => {
 	}
 
 	const logsContainer = document.getElementById("logs");
-
 	logsContainer.innerHTML = "";
 
 	investigationRunning = true;
-
 	startInvestigationButton.disabled = true;
-
-	console.log("Investigation started.");
 
 	try {
 		const response = await fetch(`${API_URL}/actions/generate`, {
@@ -690,11 +696,7 @@ startInvestigationButton.addEventListener("click", async () => {
 
 		const logs = await response.json();
 
-		console.log(`Day ${game.investigationDay} logs:`, logs);
-
 		const visibleLogs = logs.filter((log) => log.camera !== null);
-
-		console.log("Visible camera logs:", visibleLogs);
 
 		const updatedGameResponse = await fetch(`${API_URL}/game/active?playerId=${playerId}`);
 
@@ -722,7 +724,6 @@ startInvestigationButton.addEventListener("click", async () => {
 			const elapsedGameMinutes = elapsedSeconds * GAME_MINUTES_PER_REAL_SECOND;
 
 			const hours = Math.floor(elapsedGameMinutes / 60);
-
 			const minutes = Math.floor(elapsedGameMinutes % 60);
 
 			const currentGameMinutes = hours * 60 + minutes;
@@ -739,22 +740,15 @@ startInvestigationButton.addEventListener("click", async () => {
 				}
 
 				displayInvestigationLog(log);
-
 				displayedLogIndex++;
 			}
 
-			console.log(`Investigation time: ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`);
-
 			if (elapsedGameMinutes >= 24 * 60) {
 				clearInterval(investigationTimer);
-
 				investigationTimer = null;
 
 				stopGameClock();
-
 				investigationRunning = false;
-
-				console.log("Investigation day finished.");
 
 				try {
 					const finishResponse = await fetch(`${API_URL}/game/finish-investigation`, {
@@ -767,6 +761,7 @@ startInvestigationButton.addEventListener("click", async () => {
 				} catch (error) {
 					console.error("Error finishing investigation on server:", error);
 				}
+
 				startInvestigationButton.disabled = true;
 
 				if (updatedGame.investigationDay >= 4) {
@@ -774,32 +769,31 @@ startInvestigationButton.addEventListener("click", async () => {
 					accusationButton.disabled = false;
 					accusationButton.style.display = "block";
 
-					const logsContainer = document.getElementById("logs");
-
 					if (logsContainer) {
 						logsContainer.innerHTML += `
-            <p class="final-day-message">
-                THIS WAS THE FINAL INVESTIGATION DAY.
-                <br>
-                Review the resident files and log archive before making your guess.
-            </p>
-        `;
+							<p class="final-day-message">
+								THIS WAS THE FINAL INVESTIGATION DAY.
+								<br>
+								Review the resident files and log archive before making your guess.
+							</p>
+						`;
 					}
-
-					console.log("Final investigation day finished.");
+				} else {
+					nextDayButton.disabled = false;
 				}
-			} else {
-				nextDayButton.disabled = false;
 			}
 		}, 1000);
 	} catch (error) {
 		console.error("Error starting investigation:", error);
 
 		investigationRunning = false;
-
 		startInvestigationButton.disabled = false;
 	}
 });
+
+/* -------------------------
+   ACCUSATION
+------------------------- */
 
 accusationButton.addEventListener("click", async () => {
 	accusationOverlay.style.display = "flex";
@@ -807,36 +801,83 @@ accusationButton.addEventListener("click", async () => {
 	await loadAccusationResidents();
 });
 
+async function loadAccusationResidents() {
+	try {
+		const response = await fetch(`${API_URL}/residents`);
+
+		if (!response.ok) {
+			throw new Error("Failed to load residents.");
+		}
+
+		const residents = await response.json();
+
+		accusationResidents.innerHTML = "";
+		selectedAccusations = [];
+
+		residents.forEach((resident) => {
+			const button = document.createElement("button");
+
+			button.classList.add("accusation-resident");
+			button.textContent = resident.name;
+
+			button.addEventListener("click", () => {
+				if (selectedAccusations.includes(resident.name)) {
+					selectedAccusations = selectedAccusations.filter((name) => name !== resident.name);
+
+					button.classList.remove("selected");
+				} else {
+					// A maximum of three residents can be selected.
+					if (selectedAccusations.length >= 3) {
+						return;
+					}
+
+					selectedAccusations.push(resident.name);
+					button.classList.add("selected");
+				}
+
+				document.querySelectorAll(".accusation-resident").forEach((residentButton) => {
+					const isSelected = residentButton.classList.contains("selected");
+
+					residentButton.disabled = selectedAccusations.length >= 3 && !isSelected;
+				});
+			});
+
+			accusationResidents.appendChild(button);
+		});
+	} catch (error) {
+		console.error("Error loading accusation residents:", error);
+
+		accusationResidents.innerHTML = "<p>Could not load the residents.</p>";
+	}
+}
+
 submitAccusationButton.addEventListener("click", async () => {
 	if (selectedAccusations.length === 0) {
 		accusationResult.innerHTML = `
-            <p class="accusation-warning">
-                Please select at least one resident.
-            </p>
-        `;
+			<p class="accusation-warning">
+				Please select at least one resident.
+			</p>
+		`;
+
 		return;
 	}
 
 	try {
 		const response = await fetch(`${API_URL}/residents/accuse`, {
 			method: "POST",
-
 			headers: {
 				"Content-Type": "application/json",
 			},
-
 			body: JSON.stringify({
 				accusations: selectedAccusations,
 			}),
 		});
 
 		const result = await response.json();
-		console.log("Server response:", result);
 
 		if (!response.ok) {
 			throw new Error(result.error);
 		}
-		console.log("Accusation result:", result);
 
 		accusationResidents.style.display = "none";
 		submitAccusationButton.style.display = "none";
@@ -846,51 +887,54 @@ submitAccusationButton.addEventListener("click", async () => {
 
 		if (result.correct) {
 			resultTitle = "✓ ALL CORRECT";
+
 			resultMessage = `
-                <p>
-                    You identified all members of the cult.
-                </p>
-            `;
+				<p>
+					You identified all members of the cult.
+				</p>
+			`;
 		} else if (result.correctCount > 0) {
 			resultTitle = "⚠ PARTIALLY CORRECT";
+
 			resultMessage = `
-                <p>
-                    You identified some members of the cult,
-                    but not all of them.
-                </p>
-            `;
+				<p>
+					You identified some members of the cult,
+					but not all of them.
+				</p>
+			`;
 		} else {
 			resultTitle = "✕ ALL WRONG";
+
 			resultMessage = `
-                <p>
-                    None of your accusations were correct.
-                </p>
-            `;
+				<p>
+					None of your accusations were correct.
+				</p>
+			`;
 		}
 
 		accusationResult.innerHTML = `
-            <div class="accusation-result-screen">
+			<div class="accusation-result-screen">
 
-                <h2>${resultTitle}</h2>
+				<h2>${resultTitle}</h2>
 
-                ${resultMessage}
+				${resultMessage}
 
-                ${
-									!result.correct
-										? `
-                            <div class="correct-answers">
-                                <h3>THE ACTUAL CULT MEMBERS WERE:</h3>
+				${
+					!result.correct
+						? `
+							<div class="correct-answers">
+								<h3>THE ACTUAL CULT MEMBERS WERE:</h3>
 
-                                <p>
-                                    ${result.actualCultMembers.join("<br>")}
-                                </p>
-                            </div>
-                        `
-										: ""
-								}
+								<p>
+									${result.actualCultMembers.join("<br>")}
+								</p>
+							</div>
+						`
+						: ""
+				}
 
-            </div>
-        `;
+			</div>
+		`;
 
 		resultNewGameButton.style.display = "block";
 		caseReportButton.style.display = "block";
@@ -898,12 +942,17 @@ submitAccusationButton.addEventListener("click", async () => {
 		console.error("Error submitting accusation:", error);
 
 		accusationResult.innerHTML = `
-            <p class="accusation-warning">
-                Something went wrong while submitting the accusation.
-            </p>
-        `;
+			<p class="accusation-warning">
+				Something went wrong while submitting the accusation.
+			</p>
+		`;
 	}
 });
+
+closeAccusationBtn.addEventListener("click", () => {
+	accusationOverlay.style.display = "none";
+});
+
 resultNewGameButton.addEventListener("click", () => {
 	const confirmNewGame = confirm("Are you sure you want to start a new game? This will reset all camera placements and generate new locations.");
 
@@ -917,61 +966,11 @@ resultNewGameButton.addEventListener("click", () => {
 		newGame();
 	}
 });
-async function loadAccusationResidents() {
-	try {
-		const response = await fetch(`${API_URL}/residents`);
 
-		if (!response.ok) {
-			throw new Error("Failed to load residents.");
-		}
+/* -------------------------
+   NEXT INVESTIGATION DAY
+------------------------- */
 
-		const residents = await response.json();
-
-		accusationResidents.innerHTML = "";
-
-		selectedAccusations = [];
-
-		residents.forEach((resident) => {
-			const button = document.createElement("button");
-
-			button.classList.add("accusation-resident");
-
-			button.textContent = resident.name;
-
-			button.addEventListener("click", () => {
-				if (selectedAccusations.includes(resident.name)) {
-					selectedAccusations = selectedAccusations.filter((name) => name !== resident.name);
-
-					button.classList.remove("selected");
-				} else {
-					if (selectedAccusations.length >= 3) {
-						return;
-					}
-
-					selectedAccusations.push(resident.name);
-
-					button.classList.add("selected");
-				}
-
-				document.querySelectorAll(".accusation-resident").forEach((residentButton) => {
-					const isSelected = residentButton.classList.contains("selected");
-
-					residentButton.disabled = selectedAccusations.length >= 3 && !isSelected;
-				});
-
-				console.log("Selected accusations:", selectedAccusations);
-			});
-
-			accusationResidents.appendChild(button);
-		});
-	} catch (error) {
-		console.error("Error loading accusation residents:", error);
-		accusationResidents.innerHTML = "<p>Could not load the residents.</p>";
-	}
-}
-closeAccusationBtn.addEventListener("click", () => {
-	accusationOverlay.style.display = "none";
-});
 nextDayButton.addEventListener("click", async () => {
 	if (investigationRunning) {
 		return;
@@ -982,18 +981,12 @@ nextDayButton.addEventListener("click", async () => {
 			method: "POST",
 		});
 
-		const responseText = await response.text();
-
-		console.log("NEXT DAY status:", response.status);
-		console.log("NEXT DAY response:", responseText);
-
 		if (!response.ok) {
 			throw new Error(`Failed to start next investigation day. Status: ${response.status}`);
 		}
 
-		const data = JSON.parse(responseText);
+		const data = await response.json();
 
-		console.log("Next investigation day:", data);
 		const dayElement = document.getElementById("investigation-day");
 
 		if (dayElement) {
@@ -1005,6 +998,7 @@ nextDayButton.addEventListener("click", async () => {
 
 			dayElement.textContent = `INVESTIGATION DAY ${data.game.investigationDay} ${weekday.toUpperCase()}`;
 		}
+
 		const logsContainer = document.getElementById("logs");
 
 		if (logsContainer) {
@@ -1026,15 +1020,17 @@ nextDayButton.addEventListener("click", async () => {
 		}
 
 		stopGameClock();
+
 		nextDayButton.disabled = true;
-
 		startInvestigationButton.disabled = false;
-
-		console.log(`Investigation Day ${data.game.investigationDay} ready.`);
 	} catch (error) {
 		console.error("Error starting next investigation day:", error);
 	}
 });
+
+/* -------------------------
+   GAME CLOCK
+------------------------- */
 
 function startGameClock(startedAt) {
 	if (gameClockInterval) {
@@ -1049,12 +1045,14 @@ function startGameClock(startedAt) {
 		updateGameClock();
 	}, 50);
 }
+
 function stopGameClock() {
 	if (gameClockInterval) {
 		clearInterval(gameClockInterval);
 		gameClockInterval = null;
 	}
 }
+
 function updateGameClock() {
 	if (!gameStartRealTime) {
 		return;
@@ -1073,9 +1071,7 @@ function updateGameClock() {
 	}
 
 	const hours = Math.floor(totalGameMinutes / 60) % 24;
-
 	const minutes = Math.floor(totalGameMinutes % 60);
-
 	const seconds = Math.floor((realElapsedSeconds * 60) % 60);
 
 	const formattedTime = `${String(hours).padStart(2, "0")}:` + `${String(minutes).padStart(2, "0")}:` + `${String(seconds).padStart(2, "0")}`;
@@ -1083,12 +1079,15 @@ function updateGameClock() {
 	document.getElementById("game-time").textContent = formattedTime;
 }
 
+/* -------------------------
+   RESUME ACTIVE GAME
+------------------------- */
+
 async function resumeInvestigation() {
 	try {
 		const response = await fetch(`${API_URL}/game/active?playerId=${playerId}`);
 
 		if (response.status === 404) {
-			console.log("No active game yet.");
 			return;
 		}
 
@@ -1097,9 +1096,9 @@ async function resumeInvestigation() {
 		}
 
 		const game = await response.json();
+
 		accusationButton.disabled = true;
 		accusationButton.style.display = "block";
-		console.log("Active game:", game);
 
 		const dayElement = document.getElementById("investigation-day");
 
@@ -1112,9 +1111,8 @@ async function resumeInvestigation() {
 
 			dayElement.textContent = `INVESTIGATION DAY ${game.investigationDay} — ${weekday.toUpperCase()}`;
 		}
-		if (game.investigationDay >= 4 && !game.investigationRunning) {
-			console.log("Day 4 has already been completed.");
 
+		if (game.investigationDay >= 4 && !game.investigationRunning) {
 			investigationRunning = false;
 
 			const gameTime = document.getElementById("game-time");
@@ -1136,14 +1134,10 @@ async function resumeInvestigation() {
 			accusationButton.style.display = "block";
 			accusationButton.disabled = false;
 
-			console.log("Final accusation is available.");
-
 			return;
 		}
 
 		if (game.investigationRunning && game.investigationStartedAt) {
-			console.log("Resuming investigation clock...");
-
 			investigationRunning = true;
 
 			startGameClock(game.investigationStartedAt);
@@ -1158,11 +1152,8 @@ async function resumeInvestigation() {
 			}
 
 			const logs = await logsResponse.json();
-			console.log("Saved logs:", logs);
 
 			const visibleLogs = logs.filter((log) => log.camera !== null);
-
-			console.log("Visible saved logs:", visibleLogs);
 
 			startInvestigationLogPlayback(visibleLogs, game.investigationStartedAt);
 
@@ -1172,16 +1163,14 @@ async function resumeInvestigation() {
 		investigationRunning = false;
 
 		startInvestigationButton.disabled = false;
-
 		nextDayButton.disabled = true;
-
-		console.log(`Investigation Day ${game.investigationDay} is ready.`);
 	} catch (error) {
 		console.error("Error resuming investigation:", error);
 	}
 }
 
 resumeInvestigation();
+
 function startInvestigationLogPlayback(visibleLogs, investigationStartedAt) {
 	if (investigationTimer) {
 		clearInterval(investigationTimer);
@@ -1221,9 +1210,8 @@ function startInvestigationLogPlayback(visibleLogs, investigationStartedAt) {
 		if (elapsedGameMinutes >= 24 * 60) {
 			clearInterval(investigationTimer);
 
+			investigationTimer = null;
 			investigationRunning = false;
-
-			console.log("Investigation day finished.");
 
 			return;
 		}
@@ -1233,9 +1221,15 @@ function startInvestigationLogPlayback(visibleLogs, investigationStartedAt) {
 
 	investigationTimer = setInterval(checkLogs, 1000);
 }
+
+/* -------------------------
+   CASE REPORT
+------------------------- */
+
 caseReportButton.addEventListener("click", async () => {
 	await generateCaseReport();
 });
+
 closeCaseReportButton.addEventListener("click", () => {
 	caseReportOverlay.style.display = "none";
 });
@@ -1357,8 +1351,6 @@ async function generateCaseReport() {
 		document.getElementById("summary-residents").textContent = residents.length;
 
 		caseReportOverlay.style.display = "flex";
-
-		console.log("Case report generated.");
 	} catch (error) {
 		console.error("Error generating case report:", error);
 	}

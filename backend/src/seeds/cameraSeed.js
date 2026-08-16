@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const mongoose = require("mongoose");
 const Camera = require("../models/Camera");
 
@@ -26,17 +28,16 @@ const cameras = [
 
 async function seedCameras() {
 	try {
-		await mongoose.connect("mongodb://localhost:27017/neighbourhood-surveillance");
+		await mongoose.connect(process.env.MONGO_URI);
 
 		await Camera.deleteMany();
-
 		await Camera.insertMany(cameras);
 
-		console.log("Cameras seeded successfully");
-
-		mongoose.connection.close();
+		console.log("Cameras seeded successfully.");
 	} catch (error) {
 		console.error("Error seeding cameras:", error);
+	} finally {
+		await mongoose.connection.close();
 	}
 }
 

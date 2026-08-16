@@ -1,6 +1,9 @@
+require("dotenv").config();
+
 const mongoose = require("mongoose");
 const Resident = require("../models/Resident");
 
+// Initial resident data used to populate the database.
 const residents = [
 	{
 		name: "Rick Grimes",
@@ -72,17 +75,17 @@ const residents = [
 
 async function seedResidents() {
 	try {
-		await mongoose.connect("mongodb://localhost:27017/neighbourhood-surveillance");
+		await mongoose.connect(process.env.MONGO_URI);
 
+		// Replace existing residents with the seed data.
 		await Resident.deleteMany();
-
 		await Resident.insertMany(residents);
 
 		console.log("Residents added!");
-
-		mongoose.disconnect();
 	} catch (error) {
-		console.error(error);
+		console.error("Error seeding residents:", error);
+	} finally {
+		await mongoose.connection.close();
 	}
 }
 

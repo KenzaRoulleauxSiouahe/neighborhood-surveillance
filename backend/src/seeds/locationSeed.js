@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const mongoose = require("mongoose");
 const Location = require("../models/Location");
 
@@ -12,55 +14,46 @@ const locations = [
 		type: "house",
 		zone: null,
 	},
-
 	{
 		name: "Daryl's House",
 		type: "house",
 		zone: null,
 	},
-
 	{
 		name: "Carol's House",
 		type: "house",
 		zone: null,
 	},
-
 	{
 		name: "Rosita's House",
 		type: "house",
 		zone: null,
 	},
-
 	{
 		name: "Sasha's House",
 		type: "house",
 		zone: null,
 	},
-
 	{
 		name: "Bob's House",
 		type: "house",
 		zone: null,
 	},
-
 	{
 		name: "Beth's House",
 		type: "house",
 		zone: null,
 	},
-
 	{
 		name: "Eziekiel's House",
 		type: "house",
 		zone: null,
 	},
-
 	{
 		name: "Supermarket",
 		type: "shop",
 		zone: null,
 	},
-
 	{
 		name: "School",
 		type: "school",
@@ -90,17 +83,16 @@ const locations = [
 
 async function seedLocations() {
 	try {
-		await mongoose.connect("mongodb://localhost:27017/neighbourhood-surveillance");
+		await mongoose.connect(process.env.MONGO_URI);
 
 		await Location.deleteMany();
-
 		await Location.insertMany(locations);
 
-		console.log("Locations added!");
-
-		mongoose.disconnect();
+		console.log("Locations seeded successfully.");
 	} catch (error) {
-		console.error(error);
+		console.error("Error seeding locations:", error);
+	} finally {
+		await mongoose.connection.close();
 	}
 }
 

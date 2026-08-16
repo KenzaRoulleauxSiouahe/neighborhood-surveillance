@@ -3,6 +3,24 @@ const MurderSpot = require("../models/MurderSpot");
 const Camera = require("../models/Camera");
 const Location = require("../models/Location");
 
+function getActionZone(action, resident, locations) {
+	const actualLocation = action.location === "Home" ? resident.house : action.location;
+
+	if (actualLocation?.startsWith("Murder Spot - ")) {
+		return {
+			actualLocation,
+			zone: actualLocation.replace("Murder Spot - ", ""),
+		};
+	}
+
+	const location = locations.find((location) => location.name === actualLocation);
+
+	return {
+		actualLocation,
+		zone: location ? location.zone : null,
+	};
+}
+
 async function generateDailyLogs(residents, gameDate, investigationDay) {
 	const murderSpots = await MurderSpot.find();
 
@@ -20,20 +38,9 @@ async function generateDailyLogs(residents, gameDate, investigationDay) {
 
 	for (const resident of residents) {
 		const routine = await generateDailyRoutine(resident, day, murderSpots, residents);
+
 		for (const action of routine) {
-			let zone = null;
-
-			const actualLocation = action.location === "Home" ? resident.house : action.location;
-
-			if (actualLocation?.startsWith("Murder Spot - ")) {
-				zone = actualLocation.replace("Murder Spot - ", "");
-			} else {
-				const location = locations.find((location) => location.name === actualLocation);
-
-				if (location) {
-					zone = location.zone;
-				}
-			}
+			const { actualLocation, zone } = getActionZone(action, resident, locations);
 
 			const camera = cameras.find((camera) => camera.coveredZones.includes(zone));
 
@@ -55,6 +62,7 @@ async function generateDailyLogs(residents, gameDate, investigationDay) {
 	logs.sort((a, b) => {
 		return a.time.localeCompare(b.time);
 	});
+
 	return logs;
 }
 module.exports = generateDailyLogs;

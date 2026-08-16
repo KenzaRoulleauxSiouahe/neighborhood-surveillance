@@ -10,7 +10,7 @@ async function chooseCultMembers() {
 
 	const cultSize = 3;
 
-	const shuffledResidents = residents.sort(() => Math.random() - 0.5);
+	const shuffledResidents = residents.toSorted(() => Math.random() - 0.5);
 
 	const cultMembers = shuffledResidents.slice(0, cultSize);
 

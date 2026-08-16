@@ -216,7 +216,7 @@ async function newGame() {
 
 		startInvestigationButton.disabled = true;
 
-		const playerId = localStorage.getItem("playerId");
+		console.log("PLAYER ID BEFORE START:", playerId);
 
 		const gameResponse = await fetch(`${API_URL}/game/start`, {
 			method: "POST",

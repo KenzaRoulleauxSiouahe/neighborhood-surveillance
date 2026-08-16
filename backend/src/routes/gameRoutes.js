@@ -16,7 +16,7 @@ router.post("/start", async (req, res) => {
 	try {
 		const { playerId } = req.body;
 
-		if (!playerIdId) {
+		if (!playerId) {
 			return res.status(400).json({
 				error: "User ID is required.",
 			});
@@ -93,6 +93,7 @@ router.post("/start", async (req, res) => {
 			murderSpots: murders,
 		});
 	} catch (err) {
+		console.error("ERROR STARTING GAME:", err);
 		res.status(500).json({ error: err.message });
 	}
 });
